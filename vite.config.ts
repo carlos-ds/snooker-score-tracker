@@ -11,6 +11,11 @@ export default defineConfig({
       },
     }),
   ],
+  server: {
+    allowedHosts: [
+      "nonsubscribing-refugia-bacterially.ngrok-free.dev",
+    ],
+  },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),

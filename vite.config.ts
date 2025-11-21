@@ -13,7 +13,7 @@ export default defineConfig({
   ],
   server: {
     allowedHosts: [
-      "nonsubscribing-refugia-bacterially.ngrok-free.dev",
+      "dev.casverheye.be",
     ],
   },
   resolve: {

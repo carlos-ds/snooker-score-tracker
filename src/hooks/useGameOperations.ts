@@ -1,5 +1,5 @@
-import { db } from "../lib/db";
-import { type Game } from "../lib/Game";
+import { db } from "@/lib/db";
+import { type Game } from "@/lib/Game";
 
 export const useGameOperations = () => {
   // Creates a new game with two players

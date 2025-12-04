@@ -1,4 +1,4 @@
-import { db } from "../lib/db";
+import { db } from "@/lib/db";
 
 export const usePlayerOperations = () => {
   // Adds a new player to the database

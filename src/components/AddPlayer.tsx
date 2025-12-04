@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useAddPlayerMutation } from "@/hooks/usePlayerQueries";
+import { useActiveGameQuery } from "@/hooks/useGameQueries";
 
 function AddPlayer() {
   const [step, setStep] = useState<1 | 2>(1);
@@ -8,6 +9,14 @@ function AddPlayer() {
   const [playerTwoName, setPlayerTwoName] = useState("");
 
   const addPlayerMutation = useAddPlayerMutation();
+
+  // Check if there's an active game
+  const { data: activeGame } = useActiveGameQuery();
+
+  // Disable adding players if game is active
+  if (activeGame) {
+    return null;
+  }
 
   const handleNext = (e?: React.FormEvent) => {
     e?.preventDefault();
@@ -35,6 +44,7 @@ function AddPlayer() {
     }
 
     try {
+      // Add both players - mutation automatically refreshes the list
       await Promise.all([
         addPlayerMutation.mutateAsync(playerOneName),
         addPlayerMutation.mutateAsync(playerTwoName),

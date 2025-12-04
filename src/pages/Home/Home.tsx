@@ -1,5 +1,6 @@
 import AddPlayer from "@/components/AddPlayer";
 import PlayerList from "@/components/PlayerList";
+import GameControls from "@/components/GameControls";
 import { usePlayersQuery } from "@/hooks/usePlayerQueries";
 
 function Home() {
@@ -17,6 +18,7 @@ function Home() {
     <>
       <AddPlayer />
       <PlayerList players={players} />
+      <GameControls />
     </>
   );
 }

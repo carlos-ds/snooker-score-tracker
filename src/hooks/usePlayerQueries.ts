@@ -3,7 +3,7 @@ import { usePlayerOperations } from "./usePlayerOperations";
 
 const PLAYERS_QUERY_KEY = ["players"];
 
-// Hook to fetch players using React Query
+// Hook to fetch players
 export const usePlayersQuery = () => {
   const { getAllPlayers } = usePlayerOperations();
 
@@ -13,7 +13,7 @@ export const usePlayersQuery = () => {
   });
 };
 
-// Hook to add a new player using React Query mutation
+// Hook to add a new player
 export const useAddPlayerMutation = () => {
   const { addPlayer } = usePlayerOperations();
   const queryClient = useQueryClient();
@@ -21,6 +21,19 @@ export const useAddPlayerMutation = () => {
   return useMutation({
     mutationFn: addPlayer,
     // After successful add, refresh the players list
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: PLAYERS_QUERY_KEY });
+    },
+  });
+};
+
+// Hook to delete all players
+export const useDeleteAllPlayersMutation = () => {
+  const { deleteAllPlayers } = usePlayerOperations();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: deleteAllPlayers,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: PLAYERS_QUERY_KEY });
     },

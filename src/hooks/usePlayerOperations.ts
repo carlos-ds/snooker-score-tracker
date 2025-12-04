@@ -11,5 +11,10 @@ export const usePlayerOperations = () => {
     return await db.players.toArray();
   };
 
-  return { addPlayer, getAllPlayers };
+  // Deletes all players from the database
+  const deleteAllPlayers = async (): Promise<void> => {
+    await db.players.clear();
+  };
+
+  return { addPlayer, getAllPlayers, deleteAllPlayers };
 };

@@ -21,10 +21,23 @@ export const useGameOperations = () => {
     return await db.games.where("status").equals("active").first();
   };
 
-  // Gets all games (for future use)
-  const getAllGames = async (): Promise<Game[]> => {
-    return await db.games.toArray();
+  // Marks the active game as completed
+  const completeActiveGame = async (): Promise<void> => {
+    const activeGame = await getActiveGame();
+    if (activeGame && activeGame.id) {
+      await db.games.update(activeGame.id, { status: "completed" });
+    }
   };
 
-  return { createGame, getActiveGame, getAllGames };
+  // Deletes all games from the database
+  const deleteAllGames = async (): Promise<void> => {
+    await db.games.clear();
+  };
+
+  return {
+    createGame,
+    getActiveGame,
+    completeActiveGame,
+    deleteAllGames,
+  };
 };

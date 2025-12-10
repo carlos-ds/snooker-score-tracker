@@ -2,8 +2,7 @@ import { usePlayersQuery } from "@/hooks/usePlayerQueries";
 import {
   useActiveGameQuery,
   useCreateGameMutation,
-  useCompleteGameMutation,
-  useDeleteAllGamesMutation,
+  useResetGameDataMutation,
 } from "@/hooks/useGameQueries";
 import { useDeleteAllPlayersMutation } from "@/hooks/usePlayerQueries";
 
@@ -16,8 +15,7 @@ function GameControls() {
 
   // Mutations
   const createGameMutation = useCreateGameMutation();
-  const completeGameMutation = useCompleteGameMutation();
-  const deleteAllGamesMutation = useDeleteAllGamesMutation();
+  const resetGameDataMutation = useResetGameDataMutation();
   const deleteAllPlayersMutation = useDeleteAllPlayersMutation();
 
   // Only show "Start Game" if we have exactly 2 players and no active game
@@ -36,27 +34,24 @@ function GameControls() {
     }
   };
 
-  // End game, keep players for rematch
+  // Play Again: Clear games, frames, shots but keep players
   const handlePlayAgain = async () => {
     try {
-      await completeGameMutation.mutateAsync();
+      await resetGameDataMutation.mutateAsync();
     } catch (error) {
-      console.error("Failed to complete game:", error);
+      console.error("Failed to reset game data:", error);
     }
   };
 
-  // Full reset
-  const handleResetAll = async () => {
+  // New Game: Clear everything including players
+  const handleNewGame = async () => {
     try {
-      // Complete the game first
-      await completeGameMutation.mutateAsync();
-      // Then delete all data
       await Promise.all([
-        deleteAllGamesMutation.mutateAsync(),
+        resetGameDataMutation.mutateAsync(),
         deleteAllPlayersMutation.mutateAsync(),
       ]);
     } catch (error) {
-      console.error("Failed to reset:", error);
+      console.error("Failed to reset all:", error);
     }
   };
 
@@ -77,18 +72,15 @@ function GameControls() {
         <div>
           <button
             onClick={handlePlayAgain}
-            disabled={completeGameMutation.isPending}
+            disabled={resetGameDataMutation.isPending}
           >
-            {completeGameMutation.isPending
-              ? "Ending..."
-              : "Play Again"}
+            {resetGameDataMutation.isPending ? "Resetting..." : "Play Again"}
           </button>
 
           <button
-            onClick={handleResetAll}
+            onClick={handleNewGame}
             disabled={
-              completeGameMutation.isPending ||
-              deleteAllGamesMutation.isPending ||
+              resetGameDataMutation.isPending ||
               deleteAllPlayersMutation.isPending
             }
           >

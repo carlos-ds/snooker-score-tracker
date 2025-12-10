@@ -1,8 +1,11 @@
+import { useState, useEffect } from "react";
 import { type Frame } from "@/lib/Frame";
 import {
   useEndTurnMutation,
   useRecordShotMutation,
+  useUndoLastShotMutation,
 } from "@/hooks/useShotRecording";
+import { useShotOperations } from "@/hooks/useShotOperations";
 
 interface ShotButtonsProps {
   frame: Frame;
@@ -19,6 +22,21 @@ function ShotButtons({
 }: ShotButtonsProps) {
   const recordShotMutation = useRecordShotMutation();
   const endTurnMutation = useEndTurnMutation();
+  const undoMutation = useUndoLastShotMutation();
+  const { getShotsByFrame } = useShotOperations();
+
+  const [hasShotsToUndo, setHasShotsToUndo] = useState(false);
+
+  // Check if there are shots to undo
+  useEffect(() => {
+    const checkShots = async () => {
+      if (frame.id) {
+        const shots = await getShotsByFrame(frame.id);
+        setHasShotsToUndo(shots.length > 0);
+      }
+    };
+    checkShots();
+  }, [frame, getShotsByFrame]);
 
   // Determine which balls can be potted based on game phase
   const isRedsPhase = frame.redsRemaining > 0;
@@ -34,7 +52,6 @@ function ShotButtons({
         points,
         gameId,
         playerOneId,
-        playerTwoId,
       });
     } catch (error) {
       console.error("Failed to record shot:", error);
@@ -54,9 +71,23 @@ function ShotButtons({
     }
   };
 
+  const handleUndo = async () => {
+    try {
+      await undoMutation.mutateAsync({
+        frame,
+        gameId,
+        playerOneId,
+        playerTwoId,
+      });
+    } catch (error) {
+      console.error("Failed to undo:", error);
+    }
+  };
+
+
   return (
     <div>
-      <h3>Record Shot</h3>
+      <h3>Shot</h3>
 
       {/* Phase 1: Reds still on table */}
       {isRedsPhase && (
@@ -94,11 +125,15 @@ function ShotButtons({
       )}
 
       <div>
-        <button
-          onClick={handleFoul}
-          disabled={endTurnMutation.isPending}
-        >
+        <button onClick={handleFoul} disabled={endTurnMutation.isPending}>
           {endTurnMutation.isPending ? "Switching..." : "Foul"}
+        </button>
+
+        <button
+          onClick={handleUndo}
+          disabled={undoMutation.isPending || !hasShotsToUndo}
+        >
+          {undoMutation.isPending ? "Undoing..." : "Undo"}
         </button>
       </div>
     </div>

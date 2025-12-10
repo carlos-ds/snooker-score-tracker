@@ -16,14 +16,12 @@ export const useRecordShotMutation = () => {
       points,
       gameId,
       playerOneId,
-      playerTwoId,
     }: {
       frame: Frame;
       ballType: Shot["ballType"];
       points: number;
       gameId: number;
       playerOneId: number;
-      playerTwoId: number;
     }) => {
       if (!frame.id) throw new Error("Frame ID is required");
 
@@ -87,6 +85,7 @@ export const useRecordShotMutation = () => {
 };
 
 export const useEndTurnMutation = () => {
+  const { recordShot } = useShotOperations();
   const updateFrameMutation = useUpdateFrameScoreMutation();
   const queryClient = useQueryClient();
 
@@ -107,6 +106,18 @@ export const useEndTurnMutation = () => {
       const currentPlayerId = frame.currentPlayerTurn;
       const isPlayerOne = currentPlayerId === playerOneId;
 
+      // Record a "foul" shot to track the turn change
+      const foulShot: Omit<Shot, "id"> = {
+        frameId: frame.id,
+        playerId: currentPlayerId,
+        ballType: "foul",
+        points: 0,
+        isFoul: true,
+        timestamp: new Date(),
+      };
+
+      await recordShot(foulShot);
+
       // Switch to the other player
       const nextPlayerId = isPlayerOne ? playerTwoId : playerOneId;
 
@@ -115,6 +126,128 @@ export const useEndTurnMutation = () => {
         currentPlayerTurn: nextPlayerId,
         playerOneBreak: 0,
         playerTwoBreak: 0,
+      };
+
+      await updateFrameMutation.mutateAsync({
+        frameId: frame.id,
+        updates: frameUpdates,
+        gameId,
+      });
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ["activeFrame", variables.gameId],
+      });
+    },
+  });
+};
+
+export const useUndoLastShotMutation = () => {
+  const { getShotsByFrame, deleteLastShot } = useShotOperations();
+  const updateFrameMutation = useUpdateFrameScoreMutation();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      frame,
+      gameId,
+      playerOneId,
+      playerTwoId,
+    }: {
+      frame: Frame;
+      gameId: number;
+      playerOneId: number;
+      playerTwoId: number;
+    }) => {
+      if (!frame.id) throw new Error("Frame ID is required");
+
+      // Get all shots for this frame
+      const shots = await getShotsByFrame(frame.id);
+
+      if (shots.length === 0) {
+        throw new Error("No shots to undo");
+      }
+
+      // Delete the last shot
+      await deleteLastShot(frame.id);
+
+      // Recalculate frame state from remaining shots
+      const remainingShots = shots.slice(0, -1);
+
+      // Start from initial state
+      let playerOneScore = 0;
+      let playerTwoScore = 0;
+      let playerOneBreak = 0;
+      let playerTwoBreak = 0;
+      let redsRemaining = 15;
+      let currentPlayerTurn = frame.currentPlayerTurn; // Start with whoever started the frame
+
+      // Replay all remaining shots
+      for (const shot of remainingShots) {
+        // Skip foul shots for scoring
+        if (shot.ballType !== "foul") {
+          // Count reds
+          if (shot.ballType === "red") {
+            redsRemaining--;
+          }
+
+          // Add to correct player's score
+          if (shot.playerId === playerOneId) {
+            playerOneScore += shot.points;
+          } else {
+            playerTwoScore += shot.points;
+          }
+        }
+      }
+
+      // Determine current turn: whoever made the last remaining shot
+      // If it was a foul, turn has already switched in that foul event
+      if (remainingShots.length > 0) {
+        const lastRemainingShot = remainingShots[remainingShots.length - 1];
+
+        if (lastRemainingShot.ballType === "foul") {
+          // Last action was a foul, so turn switched
+          // Current turn should be the OTHER player
+          const foulPlayerId = lastRemainingShot.playerId;
+          currentPlayerTurn =
+            foulPlayerId === playerOneId ? playerTwoId : playerOneId;
+        } else {
+          // Last action was a regular shot, turn stays with that player
+          currentPlayerTurn = lastRemainingShot.playerId;
+        }
+      } else {
+        // No shots remaining, use the starting player for this frame
+        currentPlayerTurn = playerOneId;
+      }
+
+      // Calculate breaks: count consecutive non-foul shots by the current player from the end
+      for (let i = remainingShots.length - 1; i >= 0; i--) {
+        const shot = remainingShots[i];
+
+        // If we hit a foul, break calculation stops
+        if (shot.ballType === "foul") {
+          break;
+        }
+
+        if (shot.playerId === currentPlayerTurn) {
+          if (currentPlayerTurn === playerOneId) {
+            playerOneBreak += shot.points;
+          } else {
+            playerTwoBreak += shot.points;
+          }
+        } else {
+          break;
+        }
+      }
+
+      // Update frame with recalculated values
+      const frameUpdates: Partial<Frame> = {
+        playerOneScore,
+        playerTwoScore,
+        playerOneBreak,
+        playerTwoBreak,
+        redsRemaining,
+        currentPlayerTurn,
       };
 
       await updateFrameMutation.mutateAsync({

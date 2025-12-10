@@ -1,8 +1,13 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useGameOperations } from "./useGameOperations";
+import { useFrameOperations } from "./useFrameOperations";
+
+// Queries is for data on the client side
 
 const ACTIVE_GAME_QUERY_KEY = ["activeGame"];
 const ALL_GAMES_QUERY_KEY = ["games"];
+const ACTIVE_FRAME_QUERY_KEY = ["activeFrame"];
+const GAME_FRAMES_QUERY_KEY = ["gameFrames"];
 
 // Hook to fetch the currently active game
 // Returns undefined if no active game
@@ -18,24 +23,36 @@ export const useActiveGameQuery = () => {
   });
 };
 
-// Hook to create a new game
+// Hook to create a new game and its first frame
 // Automatically invalidates the active game cache after success
 export const useCreateGameMutation = () => {
   const { createGame } = useGameOperations();
+  const { createFrame } = useFrameOperations();
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({
+    mutationFn: async ({
       playerOneId,
       playerTwoId,
     }: {
       playerOneId: number;
       playerTwoId: number;
-    }) => createGame(playerOneId, playerTwoId),
-    // After successful creation, refresh the active game query
+    }) => {
+      // Create the game first
+      const gameId = await createGame(playerOneId, playerTwoId);
+
+      // Immediately create Frame 1 with player one starting
+      if (gameId) {
+        await createFrame(gameId, 1, playerOneId);
+      }
+
+      return gameId;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ACTIVE_GAME_QUERY_KEY });
       queryClient.invalidateQueries({ queryKey: ALL_GAMES_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: ACTIVE_FRAME_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: GAME_FRAMES_QUERY_KEY }); 
     },
   });
 };

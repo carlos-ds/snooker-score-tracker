@@ -1,13 +1,20 @@
 import { type Frame } from "@/lib/Frame";
 import { type Player } from "@/lib/Player";
+import ShotButtons from "./ShotButtons";
 
 interface FrameDisplayProps {
   frame: Frame;
   playerOne: Player;
   playerTwo: Player;
+  gameId: number;
 }
 
-function FrameDisplay({ frame, playerOne, playerTwo }: FrameDisplayProps) {
+function FrameDisplay({
+  frame,
+  playerOne,
+  playerTwo,
+  gameId,
+}: FrameDisplayProps) {
   // Determine which player's turn it is
   const isPlayerOneTurn = frame.currentPlayerTurn === playerOne.id;
 
@@ -40,6 +47,14 @@ function FrameDisplay({ frame, playerOne, playerTwo }: FrameDisplayProps) {
       <div>
         <p>Reds remaining: {frame.redsRemaining}</p>
       </div>
+
+      {/* Shot Buttons */}
+      <ShotButtons
+        frame={frame}
+        gameId={gameId}
+        playerOneId={playerOne.id!}
+        playerTwoId={playerTwo.id!}
+      />
     </div>
   );
 }

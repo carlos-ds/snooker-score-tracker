@@ -34,6 +34,7 @@ function FrameContainer() {
         frame={activeFrame}
         playerOne={playerOne}
         playerTwo={playerTwo}
+        gameId={activeGame.id!}
       />
     );
   }

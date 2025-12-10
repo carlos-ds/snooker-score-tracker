@@ -1,5 +1,7 @@
 import { db } from "@/lib/db";
 
+// Operations is for database queries
+
 export const usePlayerOperations = () => {
   // Adds a new player to the database
   const addPlayer = async (name: string): Promise<number | undefined> => {

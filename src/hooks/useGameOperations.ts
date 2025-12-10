@@ -1,6 +1,8 @@
 import { db } from "@/lib/db";
 import { type Game } from "@/lib/Game";
 
+// Operations is for database queries
+
 export const useGameOperations = () => {
   // Creates a new game with two players
   const createGame = async (

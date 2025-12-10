@@ -1,6 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { usePlayerOperations } from "./usePlayerOperations";
 
+// Queries is for data on the client side
+
 const PLAYERS_QUERY_KEY = ["players"];
 
 // Hook to fetch players

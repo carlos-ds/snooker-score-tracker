@@ -26,5 +26,3 @@ function Home() {
 }
 
 export default Home;
-
-// Testing merge conflict

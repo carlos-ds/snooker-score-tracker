@@ -1,0 +1,21 @@
+.option { 
+  position: relative;
+
+  .option__input { 
+    position: absolute;
+    opacity: 0;
+    inset: 0;
+    
+    cursor: pointer;
+  }
+
+  &:has(.option__input:checked) 
+  .balls {
+    border-color: rgb(var(--clr-accent-lightest));
+    background: linear-gradient(to left top, rgb(var(--clr-accent-lighter)) 50%, rgb(var(--clr-accent-lightest)) 100%);
+
+    .balls__ball { 
+      background-color: rgb(var(--clr-accent));
+    }
+  }
+}

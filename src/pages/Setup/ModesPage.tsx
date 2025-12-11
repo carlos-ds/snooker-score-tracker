@@ -1,15 +1,15 @@
 import Header from "@/components/Header/Header";
 
 
-const Modes = () => {
+const ModesPage = () => {
   return (
     <>
       <Header pageType="select" pageTitle="MODES" />
       <main>
-        
+
       </main>
     </>
   )
 }
 
-export default Modes;
+export default ModesPage;

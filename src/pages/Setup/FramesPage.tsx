@@ -1,6 +1,6 @@
 import Header from "@/components/Header/Header"
 
-function Frames() {
+function FramesPage() {
   return (
     <>
       <Header pageType="select" pageTitle="FRAMES" />
@@ -11,4 +11,4 @@ function Frames() {
   )
 }
 
-export default Frames
+export default FramesPage;

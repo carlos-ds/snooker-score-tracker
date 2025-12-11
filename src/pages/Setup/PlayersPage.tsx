@@ -1,7 +1,7 @@
 import AddPlayer from "@/components/AddPlayer";
 import Header from "@/components/Header/Header";
 
-const Players = () => {
+const PlayersPage = () => {
   return (
     <>
       <Header pageType="text" pageTitle="PLAYERS" />
@@ -12,4 +12,4 @@ const Players = () => {
   )
 }
 
-export default Players;
+export default PlayersPage;

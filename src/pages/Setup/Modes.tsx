@@ -1,7 +1,13 @@
+import Header from "@/components/Header/Header";
+
+
 const Modes = () => {
   return (
-    <> 
-      peeka boo from Modes selection
+    <>
+      <Header pageType="select" pageTitle="MODES" />
+      <main>
+        
+      </main>
     </>
   )
 }

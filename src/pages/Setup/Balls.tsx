@@ -1,8 +1,11 @@
+import Header from "@/components/Header/Header";
 
 const Balls = () => {
   return (
     <>
-      select your balls
+      <Header pageType="select" pageTitle="BALLS" />
+      <main>
+      </main>
     </>
   )
 }

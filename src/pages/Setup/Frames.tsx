@@ -1,7 +1,12 @@
+import Header from "@/components/Header/Header"
+
 function Frames() {
   return (
     <>
-      peeka boo from Frames selection
+      <Header pageType="select" pageTitle="FRAMES" />
+      <main>
+        
+      </main>
     </>
   )
 }

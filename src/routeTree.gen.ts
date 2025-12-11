@@ -12,7 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as GameRouteImport } from './routes/game'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as SetupNamingRouteImport } from './routes/setup.naming'
+import { Route as SetupPlayersRouteImport } from './routes/setup.players'
 import { Route as SetupModesRouteImport } from './routes/setup.modes'
 import { Route as SetupFramesRouteImport } from './routes/setup.frames'
 import { Route as SetupBallsRouteImport } from './routes/setup.balls'
@@ -33,9 +33,9 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SetupNamingRoute = SetupNamingRouteImport.update({
-  id: '/setup/naming',
-  path: '/setup/naming',
+const SetupPlayersRoute = SetupPlayersRouteImport.update({
+  id: '/setup/players',
+  path: '/setup/players',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SetupModesRoute = SetupModesRouteImport.update({
@@ -67,7 +67,7 @@ export interface FileRoutesByFullPath {
   '/setup/balls': typeof SetupBallsRoute
   '/setup/frames': typeof SetupFramesRoute
   '/setup/modes': typeof SetupModesRoute
-  '/setup/naming': typeof SetupNamingRoute
+  '/setup/players': typeof SetupPlayersRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -77,7 +77,7 @@ export interface FileRoutesByTo {
   '/setup/balls': typeof SetupBallsRoute
   '/setup/frames': typeof SetupFramesRoute
   '/setup/modes': typeof SetupModesRoute
-  '/setup/naming': typeof SetupNamingRoute
+  '/setup/players': typeof SetupPlayersRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -88,7 +88,7 @@ export interface FileRoutesById {
   '/setup/balls': typeof SetupBallsRoute
   '/setup/frames': typeof SetupFramesRoute
   '/setup/modes': typeof SetupModesRoute
-  '/setup/naming': typeof SetupNamingRoute
+  '/setup/players': typeof SetupPlayersRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -100,7 +100,7 @@ export interface FileRouteTypes {
     | '/setup/balls'
     | '/setup/frames'
     | '/setup/modes'
-    | '/setup/naming'
+    | '/setup/players'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -110,7 +110,7 @@ export interface FileRouteTypes {
     | '/setup/balls'
     | '/setup/frames'
     | '/setup/modes'
-    | '/setup/naming'
+    | '/setup/players'
   id:
     | '__root__'
     | '/'
@@ -120,7 +120,7 @@ export interface FileRouteTypes {
     | '/setup/balls'
     | '/setup/frames'
     | '/setup/modes'
-    | '/setup/naming'
+    | '/setup/players'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -130,7 +130,7 @@ export interface RootRouteChildren {
   SetupBallsRoute: typeof SetupBallsRoute
   SetupFramesRoute: typeof SetupFramesRoute
   SetupModesRoute: typeof SetupModesRoute
-  SetupNamingRoute: typeof SetupNamingRoute
+  SetupPlayersRoute: typeof SetupPlayersRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -156,11 +156,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/setup/naming': {
-      id: '/setup/naming'
-      path: '/setup/naming'
-      fullPath: '/setup/naming'
-      preLoaderRoute: typeof SetupNamingRouteImport
+    '/setup/players': {
+      id: '/setup/players'
+      path: '/setup/players'
+      fullPath: '/setup/players'
+      preLoaderRoute: typeof SetupPlayersRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/setup/modes': {
@@ -211,7 +211,7 @@ const rootRouteChildren: RootRouteChildren = {
   SetupBallsRoute: SetupBallsRoute,
   SetupFramesRoute: SetupFramesRoute,
   SetupModesRoute: SetupModesRoute,
-  SetupNamingRoute: SetupNamingRoute,
+  SetupPlayersRoute: SetupPlayersRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

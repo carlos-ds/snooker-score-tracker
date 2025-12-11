@@ -1,7 +1,7 @@
 function Game() {
   return (
     <>
-      peeka boo from Game page
+      
     </>
   )
 }

@@ -1,21 +1,38 @@
-.option { 
+.option {
   position: relative;
 
-  .option__input { 
+  .option__input {
     position: absolute;
     opacity: 0;
     inset: 0;
-    
     cursor: pointer;
+    z-index: 1;
   }
 
-  &:has(.option__input:checked) 
-  .balls {
-    border-color: rgb(var(--clr-accent-lightest));
-    background: linear-gradient(to left top, rgb(var(--clr-accent-lighter)) 50%, rgb(var(--clr-accent-lightest)) 100%);
+  .option__number-input {
+    position: relative;
+    z-index: 5;
+    text-align: center;
+    border: none;
+    outline: none;
+    border-bottom: rgb(var(--clr-font-subtle)) 2px dotted;
+    background: transparent;
+  }
 
-    .balls__ball { 
-      background-color: rgb(var(--clr-accent));
+  &:has(.option__input:checked) {
+
+    &.tile { 
+      border-color: rgb(var(--clr-accent-lightest));
+      background: linear-gradient(to left top, rgb(var(--clr-accent-lighter)) 50%, rgb(var(--clr-accent-lightest)) 100%);
+    }
+
+    .balls {
+      border-color: rgb(var(--clr-accent-lightest));
+      background: linear-gradient(to left top, rgb(var(--clr-accent-lighter)) 50%, rgb(var(--clr-accent-lightest)) 100%);
+
+      .balls__ball {
+        background-color: rgb(var(--clr-accent));
+      }
     }
   }
 }

@@ -27,6 +27,8 @@ function ShotButtons({
 
   const [hasShotsToUndo, setHasShotsToUndo] = useState(false);
   const [lastShotWasRed, setLastShotWasRed] = useState(false);
+  const [isLastRedColorChoice, setIsLastRedColorChoice] = useState(false);
+  const [strictOrderIndex, setStrictOrderIndex] = useState(0);
 
   // Check if there are shots to undo and what the last shot was
   useEffect(() => {
@@ -40,6 +42,33 @@ function ShotButtons({
           .reverse()
           .find((s) => s.ballType !== "foul");
         setLastShotWasRed(lastNonFoulShot?.ballType === "red");
+
+        // Check if we're in "last red color choice" phase
+        // This is when redsRemaining = 0 but the last shot was the final red
+        const lastShot = shots[shots.length - 1];
+        const isLastRedJustPotted =
+          frame.redsRemaining === 0 && lastShot?.ballType === "red";
+
+        setIsLastRedColorChoice(isLastRedJustPotted);
+
+        // Calculate strict order index if in colors-only phase
+        if (frame.redsRemaining === 0 && !isLastRedJustPotted) {
+          // Count how many colors have been potted after all reds gone
+          let colorsPottedAfterReds = 0;
+          let redsCount = 15;
+
+          for (const shot of shots) {
+            if (shot.ballType === "red") {
+              redsCount--;
+            } else if (shot.ballType !== "foul" && redsCount === 0) {
+              colorsPottedAfterReds++;
+            }
+          }
+
+          // First color after reds is the "choice" color
+          // So strict order starts at index (colorsPottedAfterReds - 1)
+          setStrictOrderIndex(Math.max(0, colorsPottedAfterReds - 1));
+        }
       }
     };
     checkShots();
@@ -47,11 +76,7 @@ function ShotButtons({
 
   // Determine which balls can be potted based on game phase
   const isRedsPhase = frame.redsRemaining > 0;
-
-  // Colors are only enabled if:
-  // 1. Last shot was a red (in reds phase)
-  // 2. OR all reds are gone (colors only phase)
-  const colorsEnabled = !isRedsPhase || lastShotWasRed;
+  const isStrictOrderPhase = !isRedsPhase && !isLastRedColorChoice;
 
   const handlePot = async (
     ballType: "red" | "yellow" | "green" | "brown" | "blue" | "pink" | "black",
@@ -96,105 +121,91 @@ function ShotButtons({
     }
   };
 
+  // Define color order for strict clearance
+  const colorOrder = ["yellow", "green", "brown", "blue", "pink", "black"];
+
+  // Helper function to check if a color is allowed in strict order phase
+  const isColorAllowedInStrictOrder = (colorName: string) => {
+    if (!isStrictOrderPhase) return true;
+    return colorOrder[strictOrderIndex] === colorName;
+  };
+
+  // Determine if red button should be enabled
+  // Red is enabled when: in reds phase (regardless of last shot) and not currently processing
+  const redEnabled = isRedsPhase && !recordShotMutation.isPending;
+
+  // Determine if color buttons should be enabled
+  // In reds phase: colors enabled only after potting a red
+  // In last red color choice: all colors enabled
+  // In strict order: only the next color in sequence enabled
+  const yellowEnabled = isRedsPhase
+    ? lastShotWasRed && !recordShotMutation.isPending
+    : isLastRedColorChoice
+      ? !recordShotMutation.isPending
+      : isColorAllowedInStrictOrder("yellow") && !recordShotMutation.isPending;
+
+  const greenEnabled = isRedsPhase
+    ? lastShotWasRed && !recordShotMutation.isPending
+    : isLastRedColorChoice
+      ? !recordShotMutation.isPending
+      : isColorAllowedInStrictOrder("green") && !recordShotMutation.isPending;
+
+  const brownEnabled = isRedsPhase
+    ? lastShotWasRed && !recordShotMutation.isPending
+    : isLastRedColorChoice
+      ? !recordShotMutation.isPending
+      : isColorAllowedInStrictOrder("brown") && !recordShotMutation.isPending;
+
+  const blueEnabled = isRedsPhase
+    ? lastShotWasRed && !recordShotMutation.isPending
+    : isLastRedColorChoice
+      ? !recordShotMutation.isPending
+      : isColorAllowedInStrictOrder("blue") && !recordShotMutation.isPending;
+
+  const pinkEnabled = isRedsPhase
+    ? lastShotWasRed && !recordShotMutation.isPending
+    : isLastRedColorChoice
+      ? !recordShotMutation.isPending
+      : isColorAllowedInStrictOrder("pink") && !recordShotMutation.isPending;
+
+  const blackEnabled = isRedsPhase
+    ? lastShotWasRed && !recordShotMutation.isPending
+    : isLastRedColorChoice
+      ? !recordShotMutation.isPending
+      : isColorAllowedInStrictOrder("black") && !recordShotMutation.isPending;
 
   return (
     <div>
       <h3>Shot</h3>
 
-      {/* Phase 1: Reds still on table */}
-      {isRedsPhase && (
-        <>
-          <div>
-            <button
-              onClick={() => handlePot("red", 1)}
-              disabled={recordShotMutation.isPending}
-            >
-              Red (1)
-            </button>
-          </div>
+      {/* Red button */}
+      <div>
+        <button onClick={() => handlePot("red", 1)} disabled={!redEnabled}>
+          Red (1)
+        </button>
+      </div>
 
-          <div>
-            <button
-              onClick={() => handlePot("yellow", 2)}
-              disabled={!colorsEnabled || recordShotMutation.isPending}
-            >
-              Yellow (2)
-            </button>
-            <button
-              onClick={() => handlePot("green", 3)}
-              disabled={!colorsEnabled || recordShotMutation.isPending}
-            >
-              Green (3)
-            </button>
-            <button
-              onClick={() => handlePot("brown", 4)}
-              disabled={!colorsEnabled || recordShotMutation.isPending}
-            >
-              Brown (4)
-            </button>
-            <button
-              onClick={() => handlePot("blue", 5)}
-              disabled={!colorsEnabled || recordShotMutation.isPending}
-            >
-              Blue (5)
-            </button>
-            <button
-              onClick={() => handlePot("pink", 6)}
-              disabled={!colorsEnabled || recordShotMutation.isPending}
-            >
-              Pink (6)
-            </button>
-            <button
-              onClick={() => handlePot("black", 7)}
-              disabled={!colorsEnabled || recordShotMutation.isPending}
-            >
-              Black (7)
-            </button>
-          </div>
-        </>
-      )}
-
-      {/* Phase 2: All reds gone, pot colors in order */}
-      {!isRedsPhase && (
-        <div>
-          <button
-            onClick={() => handlePot("yellow", 2)}
-            disabled={recordShotMutation.isPending}
-          >
-            Yellow (2)
-          </button>
-          <button
-            onClick={() => handlePot("green", 3)}
-            disabled={recordShotMutation.isPending}
-          >
-            Green (3)
-          </button>
-          <button
-            onClick={() => handlePot("brown", 4)}
-            disabled={recordShotMutation.isPending}
-          >
-            Brown (4)
-          </button>
-          <button
-            onClick={() => handlePot("blue", 5)}
-            disabled={recordShotMutation.isPending}
-          >
-            Blue (5)
-          </button>
-          <button
-            onClick={() => handlePot("pink", 6)}
-            disabled={recordShotMutation.isPending}
-          >
-            Pink (6)
-          </button>
-          <button
-            onClick={() => handlePot("black", 7)}
-            disabled={recordShotMutation.isPending}
-          >
-            Black (7)
-          </button>
-        </div>
-      )}
+      {/* Color buttons */}
+      <div>
+        <button onClick={() => handlePot("yellow", 2)} disabled={!yellowEnabled}>
+          Yellow (2)
+        </button>
+        <button onClick={() => handlePot("green", 3)} disabled={!greenEnabled}>
+          Green (3)
+        </button>
+        <button onClick={() => handlePot("brown", 4)} disabled={!brownEnabled}>
+          Brown (4)
+        </button>
+        <button onClick={() => handlePot("blue", 5)} disabled={!blueEnabled}>
+          Blue (5)
+        </button>
+        <button onClick={() => handlePot("pink", 6)} disabled={!pinkEnabled}>
+          Pink (6)
+        </button>
+        <button onClick={() => handlePot("black", 7)} disabled={!blackEnabled}>
+          Black (7)
+        </button>
+      </div>
 
       <div>
         <button onClick={handleFoul} disabled={endTurnMutation.isPending}>

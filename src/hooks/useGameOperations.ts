@@ -36,10 +36,22 @@ export const useGameOperations = () => {
     await db.games.clear();
   };
 
+  // Deletes all frames from the database
+  const deleteAllFrames = async (): Promise<void> => {
+    await db.frames.clear();
+  };
+
+  // Deletes all shots from the database
+  const deleteAllShots = async (): Promise<void> => {
+    await db.shots.clear();
+  };
+
   return {
     createGame,
     getActiveGame,
     completeActiveGame,
     deleteAllGames,
+    deleteAllFrames,
+    deleteAllShots,
   };
 };

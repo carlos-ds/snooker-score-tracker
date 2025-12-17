@@ -86,3 +86,27 @@ export const useDeleteAllGamesMutation = () => {
     },
   });
 };
+
+// Hook to reset game data (keep players)
+// Clears games, frames, and shots
+export const useResetGameDataMutation = () => {
+  const { deleteAllGames, deleteAllFrames, deleteAllShots } =
+    useGameOperations();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async () => {
+      await Promise.all([
+        deleteAllGames(),
+        deleteAllFrames(),
+        deleteAllShots(),
+      ]);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ACTIVE_GAME_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: ALL_GAMES_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: ACTIVE_FRAME_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: GAME_FRAMES_QUERY_KEY });
+    },
+  });
+};

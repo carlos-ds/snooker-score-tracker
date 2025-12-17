@@ -31,7 +31,7 @@ function Balls({ amount }: BallsProps) {
             display: 'grid',
             gridTemplateColumns: `repeat(${row.length}, var(--ball-size))`,
             justifyContent: 'center',
-            marginTop: rowIndex === 0 ? '0' : `calc(var(--ball-size) / -2)`, // overlap 50%
+            marginTop: rowIndex === 0 ? '0' : `calc(var(--ball-size) / -2)`, 
           }}
         >
           {row.map((ball) => (

@@ -72,7 +72,6 @@ export const useUpdateFrameScoreMutation = () => {
     mutationFn: ({
       frameId,
       updates,
-      gameId,
     }: {
       frameId: number;
       updates: Partial<Frame>;
@@ -95,7 +94,6 @@ export const useCompleteFrameMutation = () => {
     mutationFn: ({
       frameId,
       winnerId,
-      gameId,
     }: {
       frameId: number;
       winnerId: number;

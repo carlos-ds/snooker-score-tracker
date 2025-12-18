@@ -8,9 +8,8 @@ import { usePlayersQuery } from "@/hooks/usePlayerQueries";
 
 function AddPlayer() {
   const [step, setStep] = useState<1 | 2>(1);
-  const [status, setStatus] = useState("Add players:");
-  const [playerOneName, setPlayerOneName] = useState("");
-  const [playerTwoName, setPlayerTwoName] = useState("");
+  const [player1, setPlayer1] = useState("");
+  const [player2, setPlayer2] = useState("");
 
   const addPlayerMutation = useAddPlayerMutation();
   const createGameMutation = useCreateGameMutation();
@@ -26,36 +25,26 @@ function AddPlayer() {
     return null;
   }
 
-  const handleNext = (e?: React.FormEvent) => {
-    e?.preventDefault();
-
-    if (playerOneName.trim() === "") {
-      setStatus("Please enter a name for player one.");
-      return;
+  const handleNext = () => {
+    if (player1.trim()) {
+      setStep(2);
     }
-
-    setStatus("Enter a name for player two:");
-    setStep(2);
   };
 
-  const handleStartGame = async (e?: React.FormEvent) => {
-    e?.preventDefault();
-
-    if (playerTwoName.trim() === "") {
-      setStatus("Please enter a name for player two.");
+  const handleStartGame = async () => {
+    if (!player1.trim() || !player2.trim()) {
       return;
     }
 
-    if (playerOneName === playerTwoName) {
-      setStatus("Player names must be unique.");
+    if (player1.trim() === player2.trim()) {
       return;
     }
 
     try {
       // Add both players and get their IDs
       const [playerOneId, playerTwoId] = await Promise.all([
-        addPlayerMutation.mutateAsync(playerOneName),
-        addPlayerMutation.mutateAsync(playerTwoName),
+        addPlayerMutation.mutateAsync(player1.trim()),
+        addPlayerMutation.mutateAsync(player2.trim()),
       ]);
 
       // Immediately start the game with the new players
@@ -67,56 +56,60 @@ function AddPlayer() {
       }
 
       // Reset form state
-      setPlayerOneName("");
-      setPlayerTwoName("");
+      setPlayer1("");
+      setPlayer2("");
       setStep(1);
     } catch (error) {
-      setStatus(
-        `Failed to start game: ${
-          error instanceof Error ? error.message : String(error)
-        }`
-      );
+      console.error("Failed to start game:", error);
     }
   };
 
+  const isLoading = addPlayerMutation.isPending || createGameMutation.isPending;
+
   return (
     <div>
-      <p>{status}</p>
+      <h2>{step === 1 ? "Player 1" : "Player 2"}</h2>
+      <p>
+        {step === 1
+          ? "Enter the first player's name"
+          : "Enter the second player's name"}
+      </p>
 
-      {step === 1 && (
-        <form onSubmit={handleNext}>
+      {step === 1 ? (
+        <div>
           <input
+            type="text"
+            value={player1}
+            onChange={(e) => setPlayer1(e.target.value)}
+            placeholder="Enter name..."
             autoFocus
-            placeholder="Player 1"
-            value={playerOneName}
-            onChange={(e) => setPlayerOneName(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleNext()}
           />
-          <button type="submit">Next</button>
-        </form>
-      )}
-
-      {step === 2 && (
-        <form onSubmit={handleStartGame}>
+          <button onClick={handleNext} disabled={!player1.trim()}>
+            Next
+          </button>
+        </div>
+      ) : (
+        <div>
+          <p>{player1} vs...</p>
           <input
+            type="text"
+            value={player2}
+            onChange={(e) => setPlayer2(e.target.value)}
+            placeholder="Enter name..."
             autoFocus
-            placeholder="Player 2"
-            value={playerTwoName}
-            onChange={(e) => setPlayerTwoName(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleStartGame()}
           />
-          <button type="button" onClick={() => setStep(1)}>
+          <button onClick={() => setStep(1)} disabled={isLoading}>
             Back
           </button>
           <button
-            type="submit"
-            disabled={
-              addPlayerMutation.isPending || createGameMutation.isPending
-            }
+            onClick={handleStartGame}
+            disabled={!player2.trim() || isLoading}
           >
-            {addPlayerMutation.isPending || createGameMutation.isPending
-              ? "Starting..."
-              : "Start Game"}
+            {isLoading ? "Starting..." : "Start Game"}
           </button>
-        </form>
+        </div>
       )}
     </div>
   );

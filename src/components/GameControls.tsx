@@ -81,7 +81,7 @@ function GameControls() {
               deleteAllPlayersMutation.isPending
             }
           >
-            New Game
+            End Game
           </button>
         </div>
       </>

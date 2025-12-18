@@ -1,5 +1,3 @@
-console.log('SW: Script loaded and parsed')
-
 self.addEventListener('install', (event) => {
   console.log('SW: Install event fired!')
   self.skipWaiting()

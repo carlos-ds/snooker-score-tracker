@@ -1,8 +1,8 @@
 import { usePlayersQuery } from "@/hooks/usePlayerQueries";
 import {
   useActiveGameQuery,
-  useCreateGameMutation,
   useResetGameDataMutation,
+  useCreateGameMutation,
 } from "@/hooks/useGameQueries";
 import { useDeleteAllPlayersMutation } from "@/hooks/usePlayerQueries";
 
@@ -14,32 +14,25 @@ function GameControls() {
   const { data: activeGame } = useActiveGameQuery();
 
   // Mutations
-  const createGameMutation = useCreateGameMutation();
   const resetGameDataMutation = useResetGameDataMutation();
+  const createGameMutation = useCreateGameMutation();
   const deleteAllPlayersMutation = useDeleteAllPlayersMutation();
 
-  // Only show "Start Game" if we have exactly 2 players and no active game
-  const canStartGame = players.length === 2 && !activeGame;
-
-  const handleStartGame = async () => {
-    if (players.length !== 2) return;
+  // Play Again: Clear games, frames, shots but keep players, then start new game
+  const handlePlayAgain = async () => {
+    if (!activeGame) return;
 
     try {
+      // Reset all game data first
+      await resetGameDataMutation.mutateAsync();
+
+      // Immediately start a new game with the same players
       await createGameMutation.mutateAsync({
-        playerOneId: players[0].id!,
-        playerTwoId: players[1].id!,
+        playerOneId: activeGame.playerOneId,
+        playerTwoId: activeGame.playerTwoId,
       });
     } catch (error) {
-      console.error("Failed to start game:", error);
-    }
-  };
-
-  // Play Again: Clear games, frames, shots but keep players
-  const handlePlayAgain = async () => {
-    try {
-      await resetGameDataMutation.mutateAsync();
-    } catch (error) {
-      console.error("Failed to reset game data:", error);
+      console.error("Failed to start new game:", error);
     }
   };
 
@@ -62,7 +55,7 @@ function GameControls() {
     const playerTwo = players.find((p) => p.id === activeGame.playerTwoId);
 
     return (
-      <div>
+      <>
         <h2>Game in Progress</h2>
         <p>
           {playerOne?.name || "Player 1"} vs {playerTwo?.name || "Player 2"}
@@ -72,9 +65,13 @@ function GameControls() {
         <div>
           <button
             onClick={handlePlayAgain}
-            disabled={resetGameDataMutation.isPending}
+            disabled={
+              resetGameDataMutation.isPending || createGameMutation.isPending
+            }
           >
-            {resetGameDataMutation.isPending ? "Resetting..." : "Play Again"}
+            {resetGameDataMutation.isPending || createGameMutation.isPending
+              ? "Starting..."
+              : "Play Again"}
           </button>
 
           <button
@@ -87,24 +84,7 @@ function GameControls() {
             New Game
           </button>
         </div>
-      </div>
-    );
-  }
-
-  if (players.length < 2) {
-    return <p>Add 2 players to start a game.</p>;
-  }
-
-  if (canStartGame) {
-    return (
-      <div>
-        <button
-          onClick={handleStartGame}
-          disabled={createGameMutation.isPending}
-        >
-          {createGameMutation.isPending ? "Starting..." : "Start Game"}
-        </button>
-      </div>
+      </>
     );
   }
 

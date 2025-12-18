@@ -1,6 +1,10 @@
 import { useState } from "react";
 import { useAddPlayerMutation } from "@/hooks/usePlayerQueries";
-import { useActiveGameQuery } from "@/hooks/useGameQueries";
+import {
+  useActiveGameQuery,
+  useCreateGameMutation,
+} from "@/hooks/useGameQueries";
+import { usePlayersQuery } from "@/hooks/usePlayerQueries";
 
 function AddPlayer() {
   const [step, setStep] = useState<1 | 2>(1);
@@ -9,12 +13,16 @@ function AddPlayer() {
   const [playerTwoName, setPlayerTwoName] = useState("");
 
   const addPlayerMutation = useAddPlayerMutation();
+  const createGameMutation = useCreateGameMutation();
 
   // Check if there's an active game
   const { data: activeGame } = useActiveGameQuery();
 
-  // Disable adding players if game is active
-  if (activeGame) {
+  // Get all players
+  const { data: players = [] } = usePlayersQuery();
+
+  // Hide form if game is active OR if 2 players already exist
+  if (activeGame || players.length >= 2) {
     return null;
   }
 
@@ -22,19 +30,19 @@ function AddPlayer() {
     e?.preventDefault();
 
     if (playerOneName.trim() === "") {
-      setStatus("Please enter player one name.");
+      setStatus("Please enter a name for player one.");
       return;
     }
 
-    setStatus("Enter player two name:");
+    setStatus("Enter a name for player two:");
     setStep(2);
   };
 
-  const handleAddPlayers = async (e?: React.FormEvent) => {
+  const handleStartGame = async (e?: React.FormEvent) => {
     e?.preventDefault();
 
     if (playerTwoName.trim() === "") {
-      setStatus("Please enter player two name.");
+      setStatus("Please enter a name for player two.");
       return;
     }
 
@@ -44,19 +52,27 @@ function AddPlayer() {
     }
 
     try {
-      // Add both players - mutation automatically refreshes the list
-      await Promise.all([
+      // Add both players and get their IDs
+      const [playerOneId, playerTwoId] = await Promise.all([
         addPlayerMutation.mutateAsync(playerOneName),
         addPlayerMutation.mutateAsync(playerTwoName),
       ]);
 
-      setStatus("Players added successfully.");
+      // Immediately start the game with the new players
+      if (playerOneId && playerTwoId) {
+        await createGameMutation.mutateAsync({
+          playerOneId,
+          playerTwoId,
+        });
+      }
+
+      // Reset form state
       setPlayerOneName("");
       setPlayerTwoName("");
       setStep(1);
     } catch (error) {
       setStatus(
-        `Failed to add players: ${
+        `Failed to start game: ${
           error instanceof Error ? error.message : String(error)
         }`
       );
@@ -80,7 +96,7 @@ function AddPlayer() {
       )}
 
       {step === 2 && (
-        <form onSubmit={handleAddPlayers}>
+        <form onSubmit={handleStartGame}>
           <input
             autoFocus
             placeholder="Player 2"
@@ -90,7 +106,16 @@ function AddPlayer() {
           <button type="button" onClick={() => setStep(1)}>
             Back
           </button>
-          <button type="submit">Save Players</button>
+          <button
+            type="submit"
+            disabled={
+              addPlayerMutation.isPending || createGameMutation.isPending
+            }
+          >
+            {addPlayerMutation.isPending || createGameMutation.isPending
+              ? "Starting..."
+              : "Start Game"}
+          </button>
         </form>
       )}
     </div>

@@ -2,7 +2,6 @@ import { useActiveGameQuery } from "@/hooks/useGameQueries";
 import { useActiveFrameQuery } from "@/hooks/useFrameQueries";
 import { usePlayersQuery } from "@/hooks/usePlayerQueries";
 import FrameDisplay from "./FrameDisplay";
-import FrameControls from "./FrameControls";
 
 function FrameContainer() {
   const { data: activeGame } = useActiveGameQuery();
@@ -39,8 +38,7 @@ function FrameContainer() {
     );
   }
 
-  // Otherwise show controls to start a frame
-  return <FrameControls />;
+  return null;
 }
 
 export default FrameContainer;

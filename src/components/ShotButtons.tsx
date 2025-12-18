@@ -185,8 +185,6 @@ function ShotButtons({
 
   return (
     <div>
-      <h3>Shot</h3>
-
       {/* Red button */}
       <div>
         <button onClick={() => handlePot("red", 1)} disabled={!redEnabled}>

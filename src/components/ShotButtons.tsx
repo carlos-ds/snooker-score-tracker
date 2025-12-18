@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { type Frame } from "@/lib/Frame";
 import {
-  useEndTurnMutation,
+  useEndBreakMutation,
   useRecordShotMutation,
   useUndoLastShotMutation,
 } from "@/hooks/useShotRecording";
@@ -21,7 +21,7 @@ function ShotButtons({
   playerTwoId,
 }: ShotButtonsProps) {
   const recordShotMutation = useRecordShotMutation();
-  const endTurnMutation = useEndTurnMutation();
+  const endBreakMutation = useEndBreakMutation();
   const undoMutation = useUndoLastShotMutation();
   const { getShotsByFrame } = useShotOperations();
 
@@ -37,15 +37,26 @@ function ShotButtons({
         const shots = await getShotsByFrame(frame.id);
         setHasShotsToUndo(shots.length > 0);
 
-        // Find the last non-foul shot to determine if it was a red
-        const lastNonFoulShot = [...shots]
-          .reverse()
-          .find((s) => s.ballType !== "foul");
-        setLastShotWasRed(lastNonFoulShot?.ballType === "red");
+        // Get the very last shot (including "foul" type)
+        const lastShot = shots[shots.length - 1];
+
+        // If the last shot was made by a DIFFERENT player than current,
+        // OR if there are no shots, then reset to "no red potted" state
+        if (!lastShot || lastShot.playerId !== frame.currentPlayerTurn) {
+          setLastShotWasRed(false);
+        } else {
+          // Last shot was by current player - check if it was a red
+          const lastNonFoulShotByCurrentPlayer = [...shots]
+            .reverse()
+            .find(
+              (s) =>
+                s.ballType !== "foul" && s.playerId === frame.currentPlayerTurn
+            );
+
+          setLastShotWasRed(lastNonFoulShotByCurrentPlayer?.ballType === "red");
+        }
 
         // Check if we're in "last red color choice" phase
-        // This is when redsRemaining = 0 but the last shot was the final red
-        const lastShot = shots[shots.length - 1];
         const isLastRedJustPotted =
           frame.redsRemaining === 0 && lastShot?.ballType === "red";
 
@@ -53,7 +64,6 @@ function ShotButtons({
 
         // Calculate strict order index if in colors-only phase
         if (frame.redsRemaining === 0 && !isLastRedJustPotted) {
-          // Count how many colors have been potted after all reds gone
           let colorsPottedAfterReds = 0;
           let redsCount = 15;
 
@@ -65,14 +75,13 @@ function ShotButtons({
             }
           }
 
-          // First color after reds is the "choice" color
-          // So strict order starts at index (colorsPottedAfterReds - 1)
           setStrictOrderIndex(Math.max(0, colorsPottedAfterReds - 1));
         }
       }
     };
     checkShots();
   }, [frame, getShotsByFrame]);
+
 
   // Determine which balls can be potted based on game phase
   const isRedsPhase = frame.redsRemaining > 0;
@@ -95,9 +104,9 @@ function ShotButtons({
     }
   };
 
-  const handleFoul = async () => {
+  const handleEndBreak = async () => {
     try {
-      await endTurnMutation.mutateAsync({
+      await endBreakMutation.mutateAsync({
         frame,
         gameId,
         playerOneId,
@@ -208,8 +217,8 @@ function ShotButtons({
       </div>
 
       <div>
-        <button onClick={handleFoul} disabled={endTurnMutation.isPending}>
-          {endTurnMutation.isPending ? "Switching..." : "Foul"}
+        <button onClick={handleEndBreak} disabled={endBreakMutation.isPending}>
+          {endBreakMutation.isPending ? "Switching..." : "End Break"}
         </button>
 
         <button

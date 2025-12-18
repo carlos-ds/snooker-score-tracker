@@ -3,6 +3,7 @@ import { useShotOperations } from "./useShotOperations";
 import { useUpdateFrameScoreMutation } from "./useFrameQueries";
 import { type Frame } from "@/lib/Frame";
 import { type Shot } from "@/lib/Shot";
+import { useFrameOperations } from "./useFrameOperations";
 
 export const useRecordShotMutation = () => {
   const { recordShot } = useShotOperations();
@@ -84,15 +85,14 @@ export const useRecordShotMutation = () => {
   });
 };
 
-export const useEndTurnMutation = () => {
+export const useEndBreakMutation = () => {
   const { recordShot } = useShotOperations();
-  const updateFrameMutation = useUpdateFrameScoreMutation();
+  const { updateFrameScore } = useFrameOperations();
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async ({
       frame,
-      gameId,
       playerOneId,
       playerTwoId,
     }: {
@@ -106,33 +106,29 @@ export const useEndTurnMutation = () => {
       const currentPlayerId = frame.currentPlayerTurn;
       const isPlayerOne = currentPlayerId === playerOneId;
 
-      // Record a "foul" shot to track the turn change
-      const foulShot: Omit<Shot, "id"> = {
+      // Record an "end break" shot to mark the end of the current player's break and switch turns
+      const endBreakShot: Omit<Shot, "id"> = {
         frameId: frame.id,
         playerId: currentPlayerId,
-        ballType: "foul",
+        ballType: "foul", // Use "foul" as the ball type marker
         points: 0,
-        isFoul: true,
+        isFoul: false, // NOT a foul - just marks end of break
         timestamp: new Date(),
       };
 
-      await recordShot(foulShot);
+      await recordShot(endBreakShot);
 
       // Switch to the other player
       const nextPlayerId = isPlayerOne ? playerTwoId : playerOneId;
 
-      // Reset both players' breaks to 0 (break ends when turn ends)
+      // Reset both players' breaks to 0 and update turn
       const frameUpdates: Partial<Frame> = {
         currentPlayerTurn: nextPlayerId,
         playerOneBreak: 0,
         playerTwoBreak: 0,
       };
 
-      await updateFrameMutation.mutateAsync({
-        frameId: frame.id,
-        updates: frameUpdates,
-        gameId,
-      });
+      await updateFrameScore(frame.id, frameUpdates);
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({

@@ -43,11 +43,6 @@ function FrameDisplay({
         </div>
       </div>
 
-      {/* Game State */}
-      <div>
-        <p>Reds remaining: {frame.redsRemaining}</p>
-      </div>
-
       {/* Shot Buttons */}
       <ShotButtons
         frame={frame}

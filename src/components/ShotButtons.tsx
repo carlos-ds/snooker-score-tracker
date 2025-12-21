@@ -1,11 +1,12 @@
-import { useState, useEffect } from "react";
-import { type Frame } from "@/lib/Frame";
+import { useEffect, useState } from "react";
+import type { Frame } from "@/types";
 import {
-  useEndBreakMutation,
-  useRecordShotMutation,
-  useUndoLastShotMutation,
-} from "@/hooks/useShotRecording";
-import { useShotOperations } from "@/hooks/useShotOperations";
+  useRecordShot,
+  useEndBreak,
+  useUndoShot,
+} from "@/features/shot/useShotHooks";
+import { getShotsByFrame } from "@/features/shot/operations";
+import { BALL_COLORS_ORDER } from "@/config/constants";
 
 interface ShotButtonsProps {
   frame: Frame;
@@ -20,82 +21,71 @@ function ShotButtons({
   playerOneId,
   playerTwoId,
 }: ShotButtonsProps) {
-  const recordShotMutation = useRecordShotMutation();
-  const endBreakMutation = useEndBreakMutation();
-  const undoMutation = useUndoLastShotMutation();
-  const { getShotsByFrame } = useShotOperations();
+  const recordShotMutation = useRecordShot();
+  const endBreakMutation = useEndBreak();
+  const undoMutation = useUndoShot();
 
   const [hasShotsToUndo, setHasShotsToUndo] = useState(false);
   const [lastShotWasRed, setLastShotWasRed] = useState(false);
   const [isLastRedColorChoice, setIsLastRedColorChoice] = useState(false);
   const [strictOrderIndex, setStrictOrderIndex] = useState(0);
 
-  // Check if there are shots to undo and what the last shot was
   useEffect(() => {
-    const checkShots = async () => {
-      if (frame.id) {
-        const shots = await getShotsByFrame(frame.id);
-        setHasShotsToUndo(shots.length > 0);
+    const updateShotState = async () => {
+      if (!frame.id) return;
 
-        // Get the very last shot (including "foul" type)
-        const lastShot = shots[shots.length - 1];
+      const shots = await getShotsByFrame(frame.id);
+      setHasShotsToUndo(shots.length > 0);
 
-        // If the last shot was made by a DIFFERENT player than current,
-        // OR if there are no shots, then reset to "no red potted" state
-        if (!lastShot || lastShot.playerId !== frame.currentPlayerTurn) {
-          setLastShotWasRed(false);
-        } else {
-          // Last shot was by current player - check if it was a red
-          const lastNonFoulShotByCurrentPlayer = [...shots]
-            .reverse()
-            .find(
-              (s) =>
-                s.ballType !== "foul" && s.playerId === frame.currentPlayerTurn
-            );
+      const lastShot = shots[shots.length - 1];
 
-          setLastShotWasRed(lastNonFoulShotByCurrentPlayer?.ballType === "red");
-        }
+      if (!lastShot || lastShot.playerId !== frame.currentPlayerTurn) {
+        setLastShotWasRed(false);
+      } else {
+        const lastNonFoulShotByCurrentPlayer = [...shots]
+          .reverse()
+          .find(
+            (s) =>
+              s.ballType !== "foul" && s.playerId === frame.currentPlayerTurn
+          );
 
-        // Check if we're in "last red color choice" phase
-        const isLastRedJustPotted =
-          frame.redsRemaining === 0 && lastShot?.ballType === "red";
+        setLastShotWasRed(lastNonFoulShotByCurrentPlayer?.ballType === "red");
+      }
 
-        setIsLastRedColorChoice(isLastRedJustPotted);
+      const isLastRedJustPotted =
+        frame.redsRemaining === 0 && lastShot?.ballType === "red";
 
-        // Calculate strict order index if in colors-only phase
-        if (frame.redsRemaining === 0 && !isLastRedJustPotted) {
-          let colorsPottedAfterReds = 0;
-          let redsCount = 15;
+      setIsLastRedColorChoice(isLastRedJustPotted);
 
-          for (const shot of shots) {
-            if (shot.ballType === "red") {
-              redsCount--;
-            } else if (shot.ballType !== "foul" && redsCount === 0) {
-              colorsPottedAfterReds++;
-            }
+      if (frame.redsRemaining === 0 && !isLastRedJustPotted) {
+        let colorsPottedAfterReds = 0;
+        let redsCount = 15;
+
+        for (const shot of shots) {
+          if (shot.ballType === "red") {
+            redsCount--;
+          } else if (shot.ballType !== "foul" && redsCount === 0) {
+            colorsPottedAfterReds++;
           }
-
-          setStrictOrderIndex(Math.max(0, colorsPottedAfterReds - 1));
         }
+
+        setStrictOrderIndex(Math.max(0, colorsPottedAfterReds - 1));
       }
     };
-    checkShots();
-  }, [frame, getShotsByFrame]);
 
+    void updateShotState();
+  }, [frame]);
 
-  // Determine which balls can be potted based on game phase
   const isRedsPhase = frame.redsRemaining > 0;
   const isStrictOrderPhase = !isRedsPhase && !isLastRedColorChoice;
 
   const handlePot = async (
-    ballType: "red" | "yellow" | "green" | "brown" | "blue" | "pink" | "black",
-    points: number
+    ballType: "red" | "yellow" | "green" | "brown" | "blue" | "pink" | "black"
   ) => {
     try {
       await recordShotMutation.mutateAsync({
         frame,
         ballType,
-        points,
         gameId,
         playerOneId,
       });
@@ -103,6 +93,7 @@ function ShotButtons({
       console.error("Failed to record shot:", error);
     }
   };
+
 
   const handleEndBreak = async () => {
     try {
@@ -130,86 +121,59 @@ function ShotButtons({
     }
   };
 
-  // Define color order for strict clearance
-  const colorOrder = ["yellow", "green", "brown", "blue", "pink", "black"];
-
-  // Helper function to check if a color is allowed in strict order phase
   const isColorAllowedInStrictOrder = (colorName: string) => {
     if (!isStrictOrderPhase) return true;
-    return colorOrder[strictOrderIndex] === colorName;
+    return BALL_COLORS_ORDER[strictOrderIndex] === colorName;
   };
 
-  // Determine if red button should be enabled
-  // Red is enabled when: in reds phase (regardless of last shot) and not currently processing
   const redEnabled = isRedsPhase && !recordShotMutation.isPending;
 
-  // Determine if color buttons should be enabled
-  // In reds phase: colors enabled only after potting a red
-  // In last red color choice: all colors enabled
-  // In strict order: only the next color in sequence enabled
-  const yellowEnabled = isRedsPhase
-    ? lastShotWasRed && !recordShotMutation.isPending
-    : isLastRedColorChoice
-      ? !recordShotMutation.isPending
-      : isColorAllowedInStrictOrder("yellow") && !recordShotMutation.isPending;
+  const computeColorEnabled = (color: (typeof BALL_COLORS_ORDER)[number]) => {
+    if (recordShotMutation.isPending) return false;
 
-  const greenEnabled = isRedsPhase
-    ? lastShotWasRed && !recordShotMutation.isPending
-    : isLastRedColorChoice
-      ? !recordShotMutation.isPending
-      : isColorAllowedInStrictOrder("green") && !recordShotMutation.isPending;
+    if (isRedsPhase) {
+      return lastShotWasRed;
+    }
 
-  const brownEnabled = isRedsPhase
-    ? lastShotWasRed && !recordShotMutation.isPending
-    : isLastRedColorChoice
-      ? !recordShotMutation.isPending
-      : isColorAllowedInStrictOrder("brown") && !recordShotMutation.isPending;
+    if (isLastRedColorChoice) {
+      return true;
+    }
 
-  const blueEnabled = isRedsPhase
-    ? lastShotWasRed && !recordShotMutation.isPending
-    : isLastRedColorChoice
-      ? !recordShotMutation.isPending
-      : isColorAllowedInStrictOrder("blue") && !recordShotMutation.isPending;
+    return isColorAllowedInStrictOrder(color);
+  };
 
-  const pinkEnabled = isRedsPhase
-    ? lastShotWasRed && !recordShotMutation.isPending
-    : isLastRedColorChoice
-      ? !recordShotMutation.isPending
-      : isColorAllowedInStrictOrder("pink") && !recordShotMutation.isPending;
-
-  const blackEnabled = isRedsPhase
-    ? lastShotWasRed && !recordShotMutation.isPending
-    : isLastRedColorChoice
-      ? !recordShotMutation.isPending
-      : isColorAllowedInStrictOrder("black") && !recordShotMutation.isPending;
+  const yellowEnabled = computeColorEnabled("yellow");
+  const greenEnabled = computeColorEnabled("green");
+  const brownEnabled = computeColorEnabled("brown");
+  const blueEnabled = computeColorEnabled("blue");
+  const pinkEnabled = computeColorEnabled("pink");
+  const blackEnabled = computeColorEnabled("black");
 
   return (
     <div>
-      {/* Red button */}
       <div>
-        <button onClick={() => handlePot("red", 1)} disabled={!redEnabled}>
+        <button onClick={() => handlePot("red")} disabled={!redEnabled}>
           Red (1)
         </button>
       </div>
 
-      {/* Color buttons */}
       <div>
-        <button onClick={() => handlePot("yellow", 2)} disabled={!yellowEnabled}>
+        <button onClick={() => handlePot("yellow")} disabled={!yellowEnabled}>
           Yellow (2)
         </button>
-        <button onClick={() => handlePot("green", 3)} disabled={!greenEnabled}>
+        <button onClick={() => handlePot("green")} disabled={!greenEnabled}>
           Green (3)
         </button>
-        <button onClick={() => handlePot("brown", 4)} disabled={!brownEnabled}>
+        <button onClick={() => handlePot("brown")} disabled={!brownEnabled}>
           Brown (4)
         </button>
-        <button onClick={() => handlePot("blue", 5)} disabled={!blueEnabled}>
+        <button onClick={() => handlePot("blue")} disabled={!blueEnabled}>
           Blue (5)
         </button>
-        <button onClick={() => handlePot("pink", 6)} disabled={!pinkEnabled}>
+        <button onClick={() => handlePot("pink")} disabled={!pinkEnabled}>
           Pink (6)
         </button>
-        <button onClick={() => handlePot("black", 7)} disabled={!blackEnabled}>
+        <button onClick={() => handlePot("black")} disabled={!blackEnabled}>
           Black (7)
         </button>
       </div>

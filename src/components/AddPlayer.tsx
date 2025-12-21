@@ -1,26 +1,17 @@
 import { useState } from "react";
-import { useAddPlayerMutation } from "@/hooks/usePlayerQueries";
-import {
-  useActiveGameQuery,
-  useCreateGameMutation,
-} from "@/hooks/useGameQueries";
-import { usePlayersQuery } from "@/hooks/usePlayerQueries";
+import { usePlayers, useCreatePlayer } from "@/features/player/usePlayerHooks";
+import { useActiveGame, useCreateGame } from "@/features/game/useGameHooks";
 
 function AddPlayer() {
   const [step, setStep] = useState<1 | 2>(1);
   const [player1, setPlayer1] = useState("");
   const [player2, setPlayer2] = useState("");
 
-  const addPlayerMutation = useAddPlayerMutation();
-  const createGameMutation = useCreateGameMutation();
+  const { data: players = [] } = usePlayers();
+  const { data: activeGame } = useActiveGame();
+  const createPlayerMutation = useCreatePlayer();
+  const createGameMutation = useCreateGame();
 
-  // Check if there's an active game
-  const { data: activeGame } = useActiveGameQuery();
-
-  // Get all players
-  const { data: players = [] } = usePlayersQuery();
-
-  // Hide form if game is active OR if 2 players already exist
   if (activeGame || players.length >= 2) {
     return null;
   }
@@ -32,22 +23,23 @@ function AddPlayer() {
   };
 
   const handleStartGame = async () => {
-    if (!player1.trim() || !player2.trim()) {
+    const trimmedPlayer1 = player1.trim();
+    const trimmedPlayer2 = player2.trim();
+
+    if (!trimmedPlayer1 || !trimmedPlayer2) {
       return;
     }
 
-    if (player1.trim() === player2.trim()) {
+    if (trimmedPlayer1 === trimmedPlayer2) {
       return;
     }
 
     try {
-      // Add both players and get their IDs
       const [playerOneId, playerTwoId] = await Promise.all([
-        addPlayerMutation.mutateAsync(player1.trim()),
-        addPlayerMutation.mutateAsync(player2.trim()),
+        createPlayerMutation.mutateAsync({ name: trimmedPlayer1 }),
+        createPlayerMutation.mutateAsync({ name: trimmedPlayer2 }),
       ]);
 
-      // Immediately start the game with the new players
       if (playerOneId && playerTwoId) {
         await createGameMutation.mutateAsync({
           playerOneId,
@@ -55,7 +47,6 @@ function AddPlayer() {
         });
       }
 
-      // Reset form state
       setPlayer1("");
       setPlayer2("");
       setStep(1);
@@ -64,7 +55,8 @@ function AddPlayer() {
     }
   };
 
-  const isLoading = addPlayerMutation.isPending || createGameMutation.isPending;
+  const isLoading =
+    createPlayerMutation.isPending || createGameMutation.isPending;
 
   return (
     <div>

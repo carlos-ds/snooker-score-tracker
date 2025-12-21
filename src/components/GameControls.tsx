@@ -1,32 +1,27 @@
-import { usePlayersQuery } from "@/hooks/usePlayerQueries";
 import {
-  useActiveGameQuery,
-  useResetGameDataMutation,
-  useCreateGameMutation,
-} from "@/hooks/useGameQueries";
-import { useDeleteAllPlayersMutation } from "@/hooks/usePlayerQueries";
+  usePlayers,
+  useDeleteAllPlayers,
+} from "@/features/player/usePlayerHooks";
+import {
+  useActiveGame,
+  useResetGameData,
+  useCreateGame,
+} from "@/features/game/useGameHooks";
 
 function GameControls() {
-  // Get all players
-  const { data: players = [] } = usePlayersQuery();
+  const { data: players = [] } = usePlayers();
+  const { data: activeGame } = useActiveGame();
 
-  // Check if there's an active game
-  const { data: activeGame } = useActiveGameQuery();
+  const resetGameDataMutation = useResetGameData();
+  const createGameMutation = useCreateGame();
+  const deleteAllPlayersMutation = useDeleteAllPlayers();
 
-  // Mutations
-  const resetGameDataMutation = useResetGameDataMutation();
-  const createGameMutation = useCreateGameMutation();
-  const deleteAllPlayersMutation = useDeleteAllPlayersMutation();
-
-  // Play Again: Clear games, frames, shots but keep players, then start new game
   const handlePlayAgain = async () => {
     if (!activeGame) return;
 
     try {
-      // Reset all game data first
       await resetGameDataMutation.mutateAsync();
 
-      // Immediately start a new game with the same players
       await createGameMutation.mutateAsync({
         playerOneId: activeGame.playerOneId,
         playerTwoId: activeGame.playerTwoId,
@@ -36,7 +31,6 @@ function GameControls() {
     }
   };
 
-  // New Game: Clear everything including players
   const handleNewGame = async () => {
     try {
       await Promise.all([
@@ -48,11 +42,14 @@ function GameControls() {
     }
   };
 
-  // Show different UI based on game state
   if (activeGame) {
-    // Find the player names by looking up their IDs
     const playerOne = players.find((p) => p.id === activeGame.playerOneId);
     const playerTwo = players.find((p) => p.id === activeGame.playerTwoId);
+
+    const isStarting =
+      resetGameDataMutation.isPending || createGameMutation.isPending;
+    const isEnding =
+      resetGameDataMutation.isPending || deleteAllPlayersMutation.isPending;
 
     return (
       <>
@@ -63,24 +60,11 @@ function GameControls() {
         <p>Started: {activeGame.createdAt.toLocaleString()}</p>
 
         <div>
-          <button
-            onClick={handlePlayAgain}
-            disabled={
-              resetGameDataMutation.isPending || createGameMutation.isPending
-            }
-          >
-            {resetGameDataMutation.isPending || createGameMutation.isPending
-              ? "Starting..."
-              : "Play Again"}
+          <button onClick={handlePlayAgain} disabled={isStarting}>
+            {isStarting ? "Starting..." : "Play Again"}
           </button>
 
-          <button
-            onClick={handleNewGame}
-            disabled={
-              resetGameDataMutation.isPending ||
-              deleteAllPlayersMutation.isPending
-            }
-          >
+          <button onClick={handleNewGame} disabled={isEnding}>
             End Game
           </button>
         </div>

@@ -73,121 +73,103 @@ h6 {
 }
 
 
-:root { 
-  --clr-bg: 220, 228, 225;
-    --clr-bg-darker: 195, 208, 204;
-    --clr-bg-darkest: 170, 187, 183;
-    --clr-bg-lighter: 238, 243, 242;
-    --clr-bg-lightest: 247, 250, 250;
-    
-    --clr-font: 10, 20, 25;
-    --clr-font-subtle: 113, 125, 130;
-    
-    --clr-accent: 63, 174, 104;
-    --clr-accent-darker: 43, 106, 74;
-    --clr-accent-darkest: 38, 92, 68;
-    --clr-accent-lighter: 167, 235, 199;
-    --clr-accent-lightest: 214, 247, 234;
-    
-    --clr-ball: 255, 0, 0;
-      --clr-ball-yellow: 255, 255, 0;
-      --clr-ball-green: 0, 128, 0;
-      --clr-ball-brown: 165, 42, 42;
-      --clr-ball-blue: 0, 0, 255;
-      --clr-ball-pink: 255, 192, 203;
-      --clr-ball-black: 0, 0, 0;
-      --clr-ball-white: 255, 255, 255;
-      --clr-ball-shadow: 50, 50, 50;
-  
-  --ball-size: 1.5rem;
-  --border-radius: 10px;
-  --header-height: 64px;
+:root {
 
-  .dark { 
-    --clr-bg: 19, 38, 47;
-      --clr-bg-darker: 14, 28, 35;
-      --clr-bg-darkest: 10, 20, 25;
-      --clr-bg-lighter: 66, 81, 89;
-      --clr-bg-lightest: 113, 125, 130;
+  --clr-gray-900: hsl(220, 15%, 12%);
+  --clr-gray-800: hsl(220, 14%, 18%);
+  --clr-gray-700: hsl(220, 13%, 25%);
+  --clr-gray-600: hsl(220, 12%, 35%);
+  --clr-gray-500: hsl(220, 10%, 45%);
+  --clr-gray-400: hsl(220, 10%, 60%);
+  --clr-gray-300: hsl(220, 12%, 75%);
+  --clr-gray-200: hsl(220, 15%, 90%);
+  --clr-gray-100: hsl(220, 20%, 97%);
 
-    --clr-font: 255, 255, 255;
-      --clr-font-subtle: 113, 125, 130;
 
-    --clr-accent: 215, 38, 56;
-      --clr-accent-darker: 171, 31, 45;
-      --clr-accent-darkest: 119, 24, 35;
-      --clr-accent-lighter: 232, 86, 99;
-      --clr-accent-lightest: 244, 138, 148;
-  }
+  --clr-primary-900: hsl(358, 65%, 12%);
+  --clr-primary-800: hsl(358, 65%, 16%);
+  --clr-primary-700: hsl(358, 70%, 22%);
+  --clr-primary-600: hsl(358, 75%, 36%);
+  --clr-primary-500: hsl(358, 75%, 46%);
+  --clr-primary-400: hsl(358, 70%, 56%);
+  --clr-primary-300: hsl(358, 60%, 68%);
+  --clr-primary-200: hsl(358, 55%, 82%);
+  --clr-primary-100: hsl(358, 50%, 92%);
+
+  --clr-bg-page: var(--clr-gray-100);
+  --clr-bg-surface: hsl(0, 0%, 100%);
+  --clr-bg-elevated: hsl(0, 0%, 100%);
+
+  --clr-text-primary: var(--clr-gray-900);
+  --clr-text-secondary: var(--clr-gray-600);
+  --clr-text-tertiary: var(--clr-gray-500);
+
+  --clr-border-subtle: var(--clr-gray-200);
+  --clr-border-strong: var(--clr-gray-300);
+
+  --clr-action-primary: var(--clr-primary-600);
+  --clr-action-primary-hover: var(--clr-primary-700);
+  --clr-action-primary-active: var(--clr-primary-800);
+
+
+  --spc-2xs: 4px;
+  --spc-xs: 8px;
+  --spc-sm: 12px;
+  --spc-md: 16px;
+  --spc-lg: 24px;
+  --spc-xl: 32px;
+  --spc-2xl: 48px;
+  --spc-3xl: 64px;
+
+  --header-height: 72px;
+
+  --rad-round: 50%;
+  --rad-sm: 4px;
+  --rad-md: 8px;
+  --rad-lg: 12px;
+  --rad-xl: 16px;
+
+  --bord-thin: 1px;
+  --bord-thick: 2px;
+
+  --ff-base: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --ff-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --fs-xs: 12px;
+  --fs-sm: 14px;
+  --fs-md: 16px;
+  --fs-lg: 20px;
+  --fs-xl: 24px;
+  --fs-2xl: 32px;
+  --fs-3xl: 40px;
+
+  --fw-regular: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+
+  --shad-sm: 0 1px 2px hsl(220, 20%, 20%, 0.06);
+  --shad-md: 0 4px 8px hsl(220, 20%, 20%, 0.10);
+  --shad-lg: 0 12px 24px hsl(220, 20%, 20%, 0.14);
 }
 
-body { 
-  height: 100svh;
-  width: 100svw;
-  height: 100dvh;
-  width: 100dvw;
 
-  #root { 
-    height: 100%;
+[data-theme="dark"] {
+  --clr-bg-page: var(--clr-gray-900);
+  --clr-bg-surface: var(--clr-gray-800);
+  --clr-bg-elevated: var(--clr-gray-700);
 
-    display: grid;
-      grid-template-rows: var(--header-height) 1fr;
-  }
+  --clr-text-primary: var(--clr-gray-100);
+  --clr-text-secondary: var(--clr-gray-300);
+  --clr-text-tertiary: var(--clr-gray-400);
 
-  background-color: rgb(var(--clr-bg));
-}
+  --clr-border-subtle: var(--clr-gray-700);
+  --clr-border-strong: var(--clr-gray-600);
 
-.form { 
-  position: relative;
+  --clr-action-primary: var(--clr-primary-500);
+  --clr-action-primary-hover: var(--clr-primary-400);
+  --clr-action-primary-active: var(--clr-primary-300);
 
-  display: grid;
-    grid-template-rows: 1fr var(--header-height);
-
-  height: 100%;
-
-  .form__body { 
-    display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
-      align-items: center;
-
-      .form__group { 
-        display: flex;
-          justify-content: space-between;
-        width: 16rem;
-        height: 7rem;
-
-        margin: 0 auto;
-      }
-  }
-
-  .form__footer { 
-    display: flex;
-      align-items: center;
-      justify-content: space-between;
-
-    padding: 0 12.5%;
-
-    background-color: rgb(var(--clr-bg-darker), 0.5);
-  }
-}
-
-.tile { 
-  box-sizing: border-box;
-
-  display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 1rem;
-
-  width: 7rem;
-  height: 100%;
-
-  border-radius: var(--border-radius);
-  border: rgb(var(--clr-bg-lightest)) 2px solid;
-  background: linear-gradient(to left top, rgb(var(--clr-bg-lighter)) 50%, rgb(var(--clr-bg-lightest)) 100%);
-
-  &.tile--input { 
-    width: 100%;
-  }
+  --shad-sm: 0 1px 2px hsl(220, 20%, 5%, 0.4);
+  --shad-md: 0 6px 12px hsl(220, 20%, 5%, 0.5);
+  --shad-lg: 0 16px 32px hsl(220, 20%, 5%, 0.6);
 }

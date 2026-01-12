@@ -1,5 +1,5 @@
-import { useRef } from "react";
 import './Options.css';
+import { useRef } from "react";
 
 type OptionsProps = {
   val: string;
@@ -7,11 +7,23 @@ type OptionsProps = {
   defaultChecked?: boolean;
   className?: string;
   hasInput?: boolean;
+  formName?: string;
 };
 
-function Options({ val, children, defaultChecked, className, hasInput }: OptionsProps) {
+function Options({ val, children, defaultChecked, className, hasInput, formName }: OptionsProps) {
 
   const radioRef = useRef<HTMLInputElement>(null);
+
+  // Check localStorage for previously selected option
+  const getShouldBeChecked = () => {
+    if (formName) {
+      const storedValue = localStorage.getItem(formName);
+      if (storedValue) {
+        return storedValue === val;
+      }
+    }
+    return defaultChecked || false;
+  };
 
   return (
     <label className={`option ${className || ""}`}>
@@ -23,7 +35,7 @@ function Options({ val, children, defaultChecked, className, hasInput }: Options
         name="option"
         value={val}
         className="option__input"
-        defaultChecked={defaultChecked}
+        defaultChecked={getShouldBeChecked()}
       />
 
       {hasInput && (

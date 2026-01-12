@@ -1,3 +1,5 @@
+import './OptionForm.css';
+
 type OptionFormProps = {
   formName: string;
   children?: React.ReactNode;

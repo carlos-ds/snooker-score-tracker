@@ -1,0 +1,24 @@
+.game-main {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - var(--header-height));
+  background-color: var(--clr-bg-page);
+  padding: var(--spc-lg);
+  gap: var(--spc-xl);
+  overflow-y: hidden;
+}
+
+.game-main h2 {
+  font-size: var(--fs-2xl);
+  font-weight: var(--fw-semibold);
+  color: var(--clr-text-primary);
+  margin: 0;
+  text-align: center;
+}
+
+.game-main p {
+  font-size: var(--fs-base);
+  color: var(--clr-text-secondary);
+  margin: 0;
+  text-align: center;
+}

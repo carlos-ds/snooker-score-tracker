@@ -11,27 +11,27 @@ function FramesPage() {
         < OptionForm formName="frames" className="form">
           <div className="form__body">
             <div className="form__group">
-              < Options className="tile" val="1" defaultChecked>
+              < Options className="tile" val="1" defaultChecked formName="frames">
                 <span className="option__label-text-small">Best of</span>
                 <p className="option__label-text">1</p>
               </ Options>
-              < Options className="tile" val="3">
+              < Options className="tile" val="3" formName="frames">
                 <span className="option__label-text-small">Best of</span>
                 <p className="option__label-text">3</p>
               </ Options>
             </div>
             <div className="form__group">
-              < Options className="tile" val="5">
+              < Options className="tile" val="5" formName="frames">
                 <span className="option__label-text-small">Best of</span>
                 <p className="option__label-text">5</p>
               </ Options>
-              < Options className="tile" val="7">
+              < Options className="tile" val="7" formName="frames">
                 <span className="option__label-text-small">Best of</span>
                 <p className="option__label-text">7</p>
               </ Options>
             </div>
             <div className="form__group">
-              < Options className="tile tile--input" val="custom" hasInput>
+              < Options className="tile tile--input" val="custom" hasInput formName="frames">
                 <span className="option__label-text-small">Best of</span>
               </ Options>
             </div>

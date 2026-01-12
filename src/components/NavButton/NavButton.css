@@ -1,28 +1,67 @@
-.button { 
-  color: rgb(var(--clr-font));
+.button {
+  position: relative;
+  width: 72px;
+  height: 48px;
 
-  padding: 0.5rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  padding: var(--spc-md) var(--spc-lg);
 
-  border-radius: var(--border-radius);
-  border: rgb(var(--clr-accent)) 2px solid;
-  background: linear-gradient(to left top, rgb(var(--clr-accent)) 50%, rgb(var(--clr-accent-darker)) 100%);
+  cursor: pointer;
+  color: var(--clr-bg-surface);
 
-  svg { 
-    width: 1.5rem;
-    height: 1.5rem;
+  transition: all 0.3s ease;
+
+  border: none;
+  border-radius: var(--rad-lg);
+  box-shadow: var(--shad-md);
+  background-color: var(--clr-primary-600);
+
+  svg {
+    width: 24px;
+    height: 24px;
+    transition: transform 0.2s ease;
   }
+}
 
-  &.button--secondary { 
-    color: rgb(var(--clr-accent));
+.button:hover:not(.button--disabled) {
+  background-color: var(--clr-primary-700);
+  box-shadow: var(--shad-lg);
+  transform: translateY(-2px);
+}
 
-    border: rgb(var(--clr-accent)) 2px solid;
-    background: transparent;
-  }
+.button:active:not(.button--disabled) {
+  transform: translateY(0);
+  box-shadow: var(--shad-sm);
+}
 
-  &.button--disabled { 
-    color: rgb(var(--clr-font-subtle));
+.button:hover:not(.button--disabled) svg {
+  transform: translateX(2px);
+}
 
-    border: rgb(var(--clr-font-subtle)) 2px solid;
-    background: transparent;
-  }
+.button--secondary {
+  background: linear-gradient(135deg, var(--clr-bg-elevated) 0%, var(--clr-bg-surface) 100%);
+  border: var(--bord-thick) solid var(--clr-primary-600);
+  color: var(--clr-primary-600);
+}
+
+.button--secondary:hover:not(.button--disabled) {
+  background: linear-gradient(135deg, var(--clr-bg-surface) 0%, var(--clr-bg-elevated) 100%);
+  border-color: var(--clr-primary-700);
+  color: var(--clr-primary-700);
+}
+
+.button--secondary:hover:not(.button--disabled) svg {
+  transform: translateX(-2px);
+}
+
+.button--disabled {
+  background: linear-gradient(135deg, var(--clr-gray-300) 0%, var(--clr-gray-400) 100%);
+  border: var(--bord-thick) solid var(--clr-gray-400);
+  color: var(--clr-text-tertiary);
+  cursor: not-allowed;
+  opacity: 0.5;
+  box-shadow: none;
 }

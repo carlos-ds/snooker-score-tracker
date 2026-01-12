@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { QUERY_KEYS, BALL_POINTS } from "@/config/constants";
 import { recordShot, deleteLastShot, getShotsByFrame } from "./operations";
 import { updateFrameScore } from "@/features/frame/operations";
+import { updatePlayerHighestBreak } from "@/features/player/operations";
 import { recalculateFrameState } from "./utils/shotCalculations";
 import type { Frame, BallType } from "@/types";
 
@@ -95,6 +96,9 @@ export function useEndBreak() {
 
       const currentPlayerId = frame.currentPlayerTurn;
       const isPlayerOne = currentPlayerId === playerOneId;
+      
+      // Get the break that's being ended to track highest break
+      const breakToSave = isPlayerOne ? frame.playerOneBreak : frame.playerTwoBreak;
 
       // Record an "end break" marker using foul type
       await recordShot({
@@ -104,6 +108,11 @@ export function useEndBreak() {
         points: 0,
         isFoul: false,
       });
+
+      // Update player's highest break if current break is higher
+      if (breakToSave > 0) {
+        await updatePlayerHighestBreak(currentPlayerId, breakToSave);
+      }
 
       // Switch to other player and reset breaks
       const nextPlayerId = isPlayerOne ? playerTwoId : playerOneId;
@@ -117,6 +126,9 @@ export function useEndBreak() {
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
         queryKey: [...QUERY_KEYS.ACTIVE_FRAME, variables.gameId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: QUERY_KEYS.PLAYERS,
       });
     },
   });

@@ -1,3 +1,4 @@
+import { useNavigate } from "@tanstack/react-router";
 import {
   usePlayers,
   useDeleteAllPlayers,
@@ -9,6 +10,7 @@ import {
 } from "@/features/game/useGameHooks";
 
 function GameControls() {
+  const navigate = useNavigate();
   const { data: players = [] } = usePlayers();
   const { data: activeGame } = useActiveGame();
 
@@ -31,14 +33,22 @@ function GameControls() {
     }
   };
 
-  const handleNewGame = async () => {
+  // Handler to completely end the game and reset all data
+  // Executes cleanup sequentially to prevent race conditions and data corruption
+  const handleEndGame = async () => {
     try {
-      await Promise.all([
-        resetGameDataMutation.mutateAsync(),
-        deleteAllPlayersMutation.mutateAsync(),
-      ]);
+      // Step 1: Reset game-related data (games, frames, shots)
+      // Must happen first to maintain referential integrity
+      await resetGameDataMutation.mutateAsync();
+      
+      // Step 2: Delete all players from database
+      // Only after game data is cleared to avoid orphaned games
+      await deleteAllPlayersMutation.mutateAsync();
+      
+      // Step 3: Navigate user back to home page after successful cleanup
+      navigate({ to: "/" });
     } catch (error) {
-      console.error("Failed to reset all:", error);
+      console.error("Failed to end game:", error);
     }
   };
 
@@ -64,8 +74,8 @@ function GameControls() {
             {isStarting ? "Starting..." : "Play Again"}
           </button>
 
-          <button onClick={handleNewGame} disabled={isEnding}>
-            End Game
+          <button onClick={handleEndGame} disabled={isEnding}>
+            {isEnding ? "Ending..." : "End Game"}
           </button>
         </div>
       </>

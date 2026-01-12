@@ -7,12 +7,14 @@ import {
 } from "@/features/shot/useShotHooks";
 import { getShotsByFrame } from "@/features/shot/operations";
 import { BALL_COLORS_ORDER } from "@/config/constants";
+import "./ShotButtons.css";
 
 interface ShotButtonsProps {
   frame: Frame;
   gameId: number;
   playerOneId: number;
   playerTwoId: number;
+  onFrameComplete?: (winnerId: number) => void;
 }
 
 function ShotButtons({
@@ -20,6 +22,7 @@ function ShotButtons({
   gameId,
   playerOneId,
   playerTwoId,
+  onFrameComplete,
 }: ShotButtonsProps) {
   const recordShotMutation = useRecordShot();
   const endBreakMutation = useEndBreak();
@@ -29,6 +32,7 @@ function ShotButtons({
   const [lastShotWasRed, setLastShotWasRed] = useState(false);
   const [isLastRedColorChoice, setIsLastRedColorChoice] = useState(false);
   const [strictOrderIndex, setStrictOrderIndex] = useState(0);
+  const [isFrameComplete, setIsFrameComplete] = useState(false);
 
   useEffect(() => {
     const updateShotState = async () => {
@@ -56,6 +60,11 @@ function ShotButtons({
         frame.redsRemaining === 0 && lastShot?.ballType === "red";
 
       setIsLastRedColorChoice(isLastRedJustPotted);
+
+      // Check if frame is complete: all reds potted and black just potted
+      const isBlackJustPotted = lastShot?.ballType === "black";
+      const frameComplete = frame.redsRemaining === 0 && isBlackJustPotted;
+      setIsFrameComplete(frameComplete);
 
       if (frame.redsRemaining === 0 && !isLastRedJustPotted) {
         let colorsPottedAfterReds = 0;
@@ -121,6 +130,17 @@ function ShotButtons({
     }
   };
 
+  const handleEndFrame = () => {
+    // Determine winner based on score
+    const winnerId = frame.playerOneScore > frame.playerTwoScore 
+      ? playerOneId 
+      : playerTwoId;
+    
+    if (onFrameComplete) {
+      onFrameComplete(winnerId);
+    }
+  };
+
   const isColorAllowedInStrictOrder = (colorName: string) => {
     if (!isStrictOrderPhase) return true;
     return BALL_COLORS_ORDER[strictOrderIndex] === colorName;
@@ -150,40 +170,77 @@ function ShotButtons({
   const blackEnabled = computeColorEnabled("black");
 
   return (
-    <div>
-      <div>
-        <button onClick={() => handlePot("red")} disabled={!redEnabled}>
-          Red (1)
+    <div className="shot-buttons">
+      <div className="shot-buttons__reds">
+        <button 
+          className="shot-button red"
+          onClick={() => handlePot("red")} 
+          disabled={!redEnabled}
+        >
+          <span className="shot-button-points">({frame.redsRemaining})</span>
         </button>
       </div>
 
-      <div>
-        <button onClick={() => handlePot("yellow")} disabled={!yellowEnabled}>
-          Yellow (2)
+      <div className="shot-buttons__colors">
+        <button 
+          className="shot-button yellow"
+          onClick={() => handlePot("yellow")} 
+          disabled={!yellowEnabled}
+        >
         </button>
-        <button onClick={() => handlePot("green")} disabled={!greenEnabled}>
-          Green (3)
+        <button 
+          className="shot-button green"
+          onClick={() => handlePot("green")} 
+          disabled={!greenEnabled}
+        >
         </button>
-        <button onClick={() => handlePot("brown")} disabled={!brownEnabled}>
-          Brown (4)
+        <button 
+          className="shot-button brown"
+          onClick={() => handlePot("brown")} 
+          disabled={!brownEnabled}
+        >
         </button>
-        <button onClick={() => handlePot("blue")} disabled={!blueEnabled}>
-          Blue (5)
+        <button 
+          className="shot-button blue"
+          onClick={() => handlePot("blue")} 
+          disabled={!blueEnabled}
+        >
         </button>
-        <button onClick={() => handlePot("pink")} disabled={!pinkEnabled}>
-          Pink (6)
+        <button 
+          className="shot-button pink"
+          onClick={() => handlePot("pink")} 
+          disabled={!pinkEnabled}
+        >
         </button>
-        <button onClick={() => handlePot("black")} disabled={!blackEnabled}>
-          Black (7)
+        <button 
+          className="shot-button black"
+          onClick={() => handlePot("black")} 
+          disabled={!blackEnabled}
+        >
         </button>
       </div>
 
-      <div>
-        <button onClick={handleEndBreak} disabled={endBreakMutation.isPending}>
+      <div className="shot-buttons__actions">
+        {isFrameComplete && (
+          <button 
+            className="shot-button action"
+            onClick={handleEndFrame}
+            style={{ backgroundColor: '#16a34a' }}
+          >
+            End Frame
+          </button>
+        )}
+
+        <button 
+          className="shot-button action"
+          onClick={handleEndBreak} 
+          disabled={endBreakMutation.isPending || isFrameComplete}
+        >
           {endBreakMutation.isPending ? "Switching..." : "End Break"}
         </button>
 
         <button
+          className="shot-button action"
           onClick={handleUndo}
           disabled={undoMutation.isPending || !hasShotsToUndo}
         >

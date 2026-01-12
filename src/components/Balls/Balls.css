@@ -1,0 +1,23 @@
+.balls {
+  --ball-size: 24px;
+}
+
+.balls__row {
+  display: flex;
+  justify-content: center;
+}
+
+.balls__ball {
+  width: var(--ball-size);
+  height: var(--ball-size);
+  
+  border-radius: var(--rad-round);
+  background: linear-gradient(135deg, var(--clr-gray-400) 0%, var(--clr-gray-500) 100%);
+  box-shadow: inset -2px -2px 4px var(--clr-gray-700), inset 2px 2px 4px var(--clr-gray-300);
+  transition: all 0.3s ease;
+}
+
+.option:has(.option__input:checked) .balls__ball {
+  background: linear-gradient(135deg, var(--clr-primary-500) 0%, var(--clr-primary-600) 100%);
+  box-shadow: inset -2px -2px 4px var(--clr-primary-800), inset 2px 2px 4px var(--clr-primary-400);
+} 

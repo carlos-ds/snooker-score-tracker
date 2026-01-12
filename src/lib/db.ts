@@ -1,10 +1,5 @@
 import Dexie, { type EntityTable } from "dexie";
-
-// Interface imports
-import { type Player } from "./Player";
-import { type Game } from "./Game";
-import { type Frame } from "./Frame";
-import { type Shot } from "./Shot";
+import type { Player, Game, Frame, Shot } from "@/types";
 
 const db = new Dexie("SnookerScoreTrackerDB") as Dexie & {
   players: EntityTable<Player, "id">;
@@ -13,7 +8,7 @@ const db = new Dexie("SnookerScoreTrackerDB") as Dexie & {
   shots: EntityTable<Shot, "id">;
 };
 
-db.version(2).stores({
+db.version(1).stores({
   players: "++id, name",
   games: "++id, status, createdAt",
   frames: "++id, gameId, status, frameNumber",

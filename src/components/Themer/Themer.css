@@ -1,0 +1,39 @@
+.themer {
+  position: fixed;
+  top: var(--spc-md);
+  right: var(--spc-md);
+  z-index: 9999;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--rad-lg);
+  background: var(--clr-bg-elevated);
+  border: var(--bord-thin) solid var(--clr-border-subtle);
+  box-shadow: var(--shad-md);
+  cursor: pointer;
+  color: var(--clr-text-primary);
+}
+
+.themer:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shad-lg);
+}
+
+.themer__icon {
+  width: 20px;
+  height: 20px;
+  display: block;
+}
+
+.themer__sr-only {
+  position: absolute !important;
+  height: 1px; width: 1px;
+  overflow: hidden; clip: rect(1px, 1px, 1px, 1px);
+  white-space: nowrap; border: 0; padding: 0; margin: -1px;
+}
+
+@media (max-width: 480px) {
+  .themer { top: var(--spc-sm); right: var(--spc-sm); width: 40px; height: 40px; }
+}

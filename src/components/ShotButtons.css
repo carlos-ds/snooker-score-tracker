@@ -1,0 +1,111 @@
+.shot-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spc-lg);
+}
+
+.shot-buttons__reds {
+  display: flex;
+  justify-content: center;
+}
+
+.shot-buttons__colors {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spc-md);
+  justify-content: center;
+  align-items: center;
+}
+
+.shot-button {
+  width: 60px;
+  height: 60px;
+  border-radius: var(--rad-round);
+  border: none;
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+  color: white;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: var(--shad-md);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+}
+
+.shot-button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: scale(0.95);
+}
+
+.shot-button.red {
+  background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+  box-shadow: inset -2px -2px 4px rgba(0, 0, 0, 0.3), inset 2px 2px 4px rgba(255, 255, 255, 0.1), var(--shad-md);
+}
+.shot-button.yellow {
+  background: linear-gradient(135deg, #eab308 0%, #a16207 100%);
+  box-shadow: inset -2px -2px 4px rgba(0, 0, 0, 0.3), inset 2px 2px 4px rgba(255, 255, 255, 0.1), var(--shad-md);
+}
+
+.shot-button.green {
+  background: linear-gradient(135deg, #22c55e 0%, #15803d 100%);
+  box-shadow: inset -2px -2px 4px rgba(0, 0, 0, 0.3), inset 2px 2px 4px rgba(255, 255, 255, 0.1), var(--shad-md);
+}
+
+.shot-button.brown {
+  background: linear-gradient(135deg, #b45309 0%, #78350f 100%);
+  box-shadow: inset -2px -2px 4px rgba(0, 0, 0, 0.3), inset 2px 2px 4px rgba(255, 255, 255, 0.1), var(--shad-md);
+}
+
+.shot-button.blue {
+  background: linear-gradient(135deg, #0ea5e9 0%, #0c4a6e 100%);
+  box-shadow: inset -2px -2px 4px rgba(0, 0, 0, 0.3), inset 2px 2px 4px rgba(255, 255, 255, 0.1), var(--shad-md);
+}
+
+.shot-button.pink {
+  background: linear-gradient(135deg, #ec4899 0%, #831843 100%);
+  box-shadow: inset -2px -2px 4px rgba(0, 0, 0, 0.3), inset 2px 2px 4px rgba(255, 255, 255, 0.1), var(--shad-md);
+}
+
+.shot-button.black {
+  background: linear-gradient(135deg, #1f2937 0%, #000000 100%);
+  box-shadow: inset -2px -2px 4px rgba(0, 0, 0, 0.5), inset 2px 2px 4px rgba(255, 255, 255, 0.05), var(--shad-md);
+}
+
+.shot-buttons__actions {
+  display: flex;
+  gap: var(--spc-md);
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.shot-button.action {
+  width: auto;
+  height: auto;
+  padding: var(--spc-md) var(--spc-lg);
+  border-radius: var(--rad-lg);
+  background-color: var(--clr-action-primary);
+  color: white;
+}
+
+.shot-button.action:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.shot-button.action:not(:disabled):active {
+  transform: scale(0.98);
+}
+
+.shot-button-label {
+  font-size: 11px;
+  opacity: 0.9;
+}
+
+.shot-button-points {
+  font-size: 10px;
+  opacity: 0.8;
+}

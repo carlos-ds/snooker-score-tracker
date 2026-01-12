@@ -1,0 +1,175 @@
+/*
+  Artevelde hogeschool CSS Reset v0.2
+  Adapted version from Josh's Custom CSS Reset https://www.joshwcomeau.com/css/custom-css-reset/
+*/
+
+/*
+  1. Use a more-intuitive box-sizing model.
+*/
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/*
+  2. Remove default margin
+*/
+* {
+  margin: 0;
+}
+
+/*
+  3. Allow percentage-based heights in the application
+*/
+html {
+  height: 100%;
+}
+
+/*
+  Typographic tweaks!
+  4. Add accessible line-height
+  5. Improve text rendering
+*/
+body {
+  min-height: 100%;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/*
+  6. Improve media defaults
+*/
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+/*
+  7. Remove built-in form typography styles
+*/
+input,
+button,
+textarea,
+select {
+  font: inherit;
+}
+
+/*
+  8. Avoid text overflows
+*/
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  overflow-wrap: break-word;
+}
+
+
+:root {
+
+  --clr-gray-900: hsl(220, 15%, 12%);
+  --clr-gray-800: hsl(220, 14%, 18%);
+  --clr-gray-700: hsl(220, 13%, 25%);
+  --clr-gray-600: hsl(220, 12%, 35%);
+  --clr-gray-500: hsl(220, 10%, 45%);
+  --clr-gray-400: hsl(220, 10%, 60%);
+  --clr-gray-300: hsl(220, 12%, 75%);
+  --clr-gray-200: hsl(220, 15%, 90%);
+  --clr-gray-100: hsl(220, 20%, 97%);
+
+
+  --clr-primary-900: hsl(358, 65%, 12%);
+  --clr-primary-800: hsl(358, 65%, 16%);
+  --clr-primary-700: hsl(358, 70%, 22%);
+  --clr-primary-600: hsl(358, 75%, 36%);
+  --clr-primary-500: hsl(358, 75%, 46%);
+  --clr-primary-400: hsl(358, 70%, 56%);
+  --clr-primary-300: hsl(358, 60%, 68%);
+  --clr-primary-200: hsl(358, 55%, 82%);
+  --clr-primary-100: hsl(358, 50%, 92%);
+
+  --clr-bg-page: var(--clr-gray-100);
+  --clr-bg-surface: hsl(0, 0%, 100%);
+  --clr-bg-elevated: hsl(0, 0%, 100%);
+
+  --clr-text-primary: var(--clr-gray-900);
+  --clr-text-secondary: var(--clr-gray-600);
+  --clr-text-tertiary: var(--clr-gray-500);
+
+  --clr-border-subtle: var(--clr-gray-200);
+  --clr-border-strong: var(--clr-gray-300);
+
+  --clr-action-primary: var(--clr-primary-600);
+  --clr-action-primary-hover: var(--clr-primary-700);
+  --clr-action-primary-active: var(--clr-primary-800);
+
+
+  --spc-2xs: 4px;
+  --spc-xs: 8px;
+  --spc-sm: 12px;
+  --spc-md: 16px;
+  --spc-lg: 24px;
+  --spc-xl: 32px;
+  --spc-2xl: 48px;
+  --spc-3xl: 64px;
+
+  --header-height: 72px;
+
+  --rad-round: 50%;
+  --rad-sm: 4px;
+  --rad-md: 8px;
+  --rad-lg: 12px;
+  --rad-xl: 16px;
+
+  --bord-thin: 1px;
+  --bord-thick: 2px;
+
+  --ff-base: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --ff-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --fs-xs: 12px;
+  --fs-sm: 14px;
+  --fs-md: 16px;
+  --fs-lg: 20px;
+  --fs-xl: 24px;
+  --fs-2xl: 32px;
+  --fs-3xl: 40px;
+
+  --fw-regular: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+
+  --shad-sm: 0 1px 2px hsl(220, 20%, 20%, 0.06);
+  --shad-md: 0 4px 8px hsl(220, 20%, 20%, 0.10);
+  --shad-lg: 0 12px 24px hsl(220, 20%, 20%, 0.14);
+}
+
+
+[data-theme="dark"] {
+  --clr-bg-page: var(--clr-gray-900);
+  --clr-bg-surface: var(--clr-gray-800);
+  --clr-bg-elevated: var(--clr-gray-700);
+
+  --clr-text-primary: var(--clr-gray-100);
+  --clr-text-secondary: var(--clr-gray-300);
+  --clr-text-tertiary: var(--clr-gray-400);
+
+  --clr-border-subtle: var(--clr-gray-700);
+  --clr-border-strong: var(--clr-gray-600);
+
+  --clr-action-primary: var(--clr-primary-500);
+  --clr-action-primary-hover: var(--clr-primary-400);
+  --clr-action-primary-active: var(--clr-primary-300);
+
+  --shad-sm: 0 1px 2px hsl(220, 20%, 5%, 0.4);
+  --shad-md: 0 6px 12px hsl(220, 20%, 5%, 0.5);
+  --shad-lg: 0 16px 32px hsl(220, 20%, 5%, 0.6);
+}

@@ -4,6 +4,7 @@ import { RouterProvider, createRouter } from "@tanstack/react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 import { routeTree } from "./routeTree.gen";
+import Themer from "@/components/Themer/Themer";
 
 const router = createRouter({ routeTree });
 
@@ -22,6 +23,7 @@ if (!rootElement.innerHTML) {
     <StrictMode>
       <QueryClientProvider client={queryClient}>
         <RouterProvider router={router} />
+        <Themer />
       </QueryClientProvider>
     </StrictMode>
   );

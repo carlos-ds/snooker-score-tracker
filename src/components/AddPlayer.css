@@ -1,0 +1,124 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - var(--header-height));
+  background-color: var(--clr-bg-page);
+}
+
+.form__body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spc-2xl);
+  padding: var(--spc-xl);
+  align-items: center;
+  justify-content: center;
+}
+
+.form__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spc-md);
+
+  height: var(--header-height);
+  padding: 0 var(--spc-xl);
+
+  box-shadow: 0 -4px 12px hsl(220, 20%, 20%, 0.06);
+  border-top: var(--bord-thin) solid var(--clr-border-subtle);
+  background-color: var(--clr-bg-surface);
+}
+
+.player-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spc-2xl);
+  width: 100%;
+  max-width: 400px;
+}
+
+.player-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spc-sm);
+}
+
+.player-label {
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-medium);
+  color: var(--clr-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: none;
+}
+
+.player-input {
+  padding: var(--spc-md) var(--spc-lg);
+  border: var(--bord-thin) solid var(--clr-border-subtle);
+  border-radius: var(--rad-md);
+  background-color: var(--clr-bg-surface);
+  color: var(--clr-text-primary);
+  font-size: var(--fs-base);
+  font-family: inherit;
+  transition: all 0.2s ease;
+  box-shadow: var(--shad-sm);
+}
+
+.player-input:focus {
+  outline: none;
+}
+
+.player-input::placeholder {
+  color: var(--clr-text-tertiary);
+}
+
+.vs-divider {
+  font-size: var(--fs-lg);
+  font-weight: var(--fw-semibold);
+  color: var(--clr-text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin: var(--spc-lg) 0;
+  display: flex;
+  align-items: center;
+  gap: var(--spc-lg);
+  width: 100%;
+  max-width: 400px;
+}
+
+.vs-divider::before,
+.vs-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background-color: var(--clr-border-subtle);
+}
+
+.team-title {
+  font-size: var(--fs-2xl);
+  font-weight: var(--fw-semibold);
+  color: var(--clr-text-primary);
+  margin: 0 0 var(--spc-xl) 0;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  display: none;
+}
+
+.game-in-progress {
+  text-align: center;
+}
+
+.game-in-progress h2 {
+  font-size: var(--fs-xl);
+  font-weight: var(--fw-semibold);
+  color: var(--clr-text-primary);
+  margin: 0 0 var(--spc-md) 0;
+}
+
+.game-in-progress p {
+  font-size: var(--fs-base);
+  color: var(--clr-text-secondary);
+  margin: 0;
+  max-width: 300px;
+}

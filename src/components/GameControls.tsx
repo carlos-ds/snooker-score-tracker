@@ -1,73 +1,68 @@
-import { usePlayersQuery } from "@/hooks/usePlayerQueries";
+import { useNavigate } from "@tanstack/react-router";
 import {
-  useActiveGameQuery,
-  useCreateGameMutation,
-  useCompleteGameMutation,
-  useDeleteAllGamesMutation,
-} from "@/hooks/useGameQueries";
-import { useDeleteAllPlayersMutation } from "@/hooks/usePlayerQueries";
+  usePlayers,
+  useDeleteAllPlayers,
+} from "@/features/player/usePlayerHooks";
+import {
+  useActiveGame,
+  useResetGameData,
+  useCreateGame,
+} from "@/features/game/useGameHooks";
 
 function GameControls() {
-  // Get all players
-  const { data: players = [] } = usePlayersQuery();
+  const navigate = useNavigate();
+  const { data: players = [] } = usePlayers();
+  const { data: activeGame } = useActiveGame();
 
-  // Check if there's an active game
-  const { data: activeGame } = useActiveGameQuery();
+  const resetGameDataMutation = useResetGameData();
+  const createGameMutation = useCreateGame();
+  const deleteAllPlayersMutation = useDeleteAllPlayers();
 
-  // Mutations
-  const createGameMutation = useCreateGameMutation();
-  const completeGameMutation = useCompleteGameMutation();
-  const deleteAllGamesMutation = useDeleteAllGamesMutation();
-  const deleteAllPlayersMutation = useDeleteAllPlayersMutation();
-
-  // Only show "Start Game" if we have exactly 2 players and no active game
-  const canStartGame = players.length === 2 && !activeGame;
-
-  const handleStartGame = async () => {
-    if (players.length !== 2) return;
+  const handlePlayAgain = async () => {
+    if (!activeGame) return;
 
     try {
+      await resetGameDataMutation.mutateAsync();
+
       await createGameMutation.mutateAsync({
-        playerOneId: players[0].id!,
-        playerTwoId: players[1].id!,
+        playerOneId: activeGame.playerOneId,
+        playerTwoId: activeGame.playerTwoId,
       });
     } catch (error) {
-      console.error("Failed to start game:", error);
+      console.error("Failed to start new game:", error);
     }
   };
 
-  // End game, keep players for rematch
-  const handlePlayAgain = async () => {
+  // Handler to completely end the game and reset all data
+  // Executes cleanup sequentially to prevent race conditions and data corruption
+  const handleEndGame = async () => {
     try {
-      await completeGameMutation.mutateAsync();
+      // Step 1: Reset game-related data (games, frames, shots)
+      // Must happen first to maintain referential integrity
+      await resetGameDataMutation.mutateAsync();
+      
+      // Step 2: Delete all players from database
+      // Only after game data is cleared to avoid orphaned games
+      await deleteAllPlayersMutation.mutateAsync();
+      
+      // Step 3: Navigate user back to home page after successful cleanup
+      navigate({ to: "/" });
     } catch (error) {
-      console.error("Failed to complete game:", error);
+      console.error("Failed to end game:", error);
     }
   };
 
-  // Full reset
-  const handleResetAll = async () => {
-    try {
-      // Complete the game first
-      await completeGameMutation.mutateAsync();
-      // Then delete all data
-      await Promise.all([
-        deleteAllGamesMutation.mutateAsync(),
-        deleteAllPlayersMutation.mutateAsync(),
-      ]);
-    } catch (error) {
-      console.error("Failed to reset:", error);
-    }
-  };
-
-  // Show different UI based on game state
   if (activeGame) {
-    // Find the player names by looking up their IDs
     const playerOne = players.find((p) => p.id === activeGame.playerOneId);
     const playerTwo = players.find((p) => p.id === activeGame.playerTwoId);
 
+    const isStarting =
+      resetGameDataMutation.isPending || createGameMutation.isPending;
+    const isEnding =
+      resetGameDataMutation.isPending || deleteAllPlayersMutation.isPending;
+
     return (
-      <div>
+      <>
         <h2>Game in Progress</h2>
         <p>
           {playerOne?.name || "Player 1"} vs {playerTwo?.name || "Player 2"}
@@ -75,44 +70,15 @@ function GameControls() {
         <p>Started: {activeGame.createdAt.toLocaleString()}</p>
 
         <div>
-          <button
-            onClick={handlePlayAgain}
-            disabled={completeGameMutation.isPending}
-          >
-            {completeGameMutation.isPending
-              ? "Ending..."
-              : "Play Again"}
+          <button onClick={handlePlayAgain} disabled={isStarting}>
+            {isStarting ? "Starting..." : "Play Again"}
           </button>
 
-          <button
-            onClick={handleResetAll}
-            disabled={
-              completeGameMutation.isPending ||
-              deleteAllGamesMutation.isPending ||
-              deleteAllPlayersMutation.isPending
-            }
-          >
-            New Game
+          <button onClick={handleEndGame} disabled={isEnding}>
+            {isEnding ? "Ending..." : "End Game"}
           </button>
         </div>
-      </div>
-    );
-  }
-
-  if (players.length < 2) {
-    return <p>Add 2 players to start a game.</p>;
-  }
-
-  if (canStartGame) {
-    return (
-      <div>
-        <button
-          onClick={handleStartGame}
-          disabled={createGameMutation.isPending}
-        >
-          {createGameMutation.isPending ? "Starting..." : "Start Game"}
-        </button>
-      </div>
+      </>
     );
   }
 

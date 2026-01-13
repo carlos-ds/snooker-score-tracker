@@ -4,9 +4,11 @@ import {
   useRecordShot,
   useEndBreak,
   useUndoShot,
+  useRecordFoul,
 } from "@/features/shot/useShotHooks";
 import { getShotsByFrame } from "@/features/shot/operations";
 import { BALL_COLORS_ORDER } from "@/config/constants";
+import FoulModal from "./FoulModal/FoulModal";
 import "./ShotButtons.css";
 
 interface ShotButtonsProps {
@@ -27,12 +29,14 @@ function ShotButtons({
   const recordShotMutation = useRecordShot();
   const endBreakMutation = useEndBreak();
   const undoMutation = useUndoShot();
+  const recordFoulMutation = useRecordFoul();
 
   const [hasShotsToUndo, setHasShotsToUndo] = useState(false);
   const [lastShotWasRed, setLastShotWasRed] = useState(false);
   const [isLastRedColorChoice, setIsLastRedColorChoice] = useState(false);
   const [strictOrderIndex, setStrictOrderIndex] = useState(0);
   const [isFrameComplete, setIsFrameComplete] = useState(false);
+  const [isFoulModalOpen, setIsFoulModalOpen] = useState(false);
 
   useEffect(() => {
     const updateShotState = async () => {
@@ -127,6 +131,21 @@ function ShotButtons({
       });
     } catch (error) {
       console.error("Failed to undo:", error);
+    }
+  };
+
+  const handleFoul = async (foulPoints: number) => {
+    try {
+      await recordFoulMutation.mutateAsync({
+        frame,
+        foulPoints,
+        gameId,
+        playerOneId,
+        playerTwoId,
+      });
+      setIsFoulModalOpen(false);
+    } catch (error) {
+      console.error("Failed to record foul:", error);
     }
   };
 
@@ -246,7 +265,22 @@ function ShotButtons({
         >
           {undoMutation.isPending ? "Undoing..." : "Undo"}
         </button>
+
+        <button
+          className="shot-button action foul"
+          onClick={() => setIsFoulModalOpen(true)}
+          disabled={recordFoulMutation.isPending || isFrameComplete}
+        >
+          Foul
+        </button>
       </div>
+
+      <FoulModal
+        isOpen={isFoulModalOpen}
+        onClose={() => setIsFoulModalOpen(false)}
+        onSelectFoulPoints={handleFoul}
+        isPending={recordFoulMutation.isPending}
+      />
     </div>
   );
 }

@@ -134,6 +134,85 @@ export function useEndBreak() {
   });
 }
 
+interface RecordFoulParams {
+  frame: Frame;
+  foulPoints: number;
+  gameId: number;
+  playerOneId: number;
+  playerTwoId: number;
+}
+
+// Hook to record a foul, award points to opponent, and switch turns.
+export function useRecordFoul() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      frame,
+      foulPoints,
+      playerOneId,
+      playerTwoId,
+    }: RecordFoulParams) => {
+      if (!frame.id) {
+        throw new Error("Frame ID is required");
+      }
+
+      const currentPlayerId = frame.currentPlayerTurn;
+      const isPlayerOne = currentPlayerId === playerOneId;
+      const opponentId = isPlayerOne ? playerTwoId : playerOneId;
+
+      // Get the break that's being ended to track highest break
+      const breakToSave = isPlayerOne ? frame.playerOneBreak : frame.playerTwoBreak;
+
+      // Record the foul shot
+      await recordShot({
+        frameId: frame.id,
+        playerId: currentPlayerId,
+        ballType: "foul",
+        points: 0,
+        isFoul: true,
+        foulPoints,
+      });
+
+      // Update player's highest break if current break is higher
+      if (breakToSave > 0) {
+        await updatePlayerHighestBreak(currentPlayerId, breakToSave);
+      }
+
+      // Calculate new opponent score (foul points go to opponent)
+      const opponentCurrentScore = isPlayerOne
+        ? frame.playerTwoScore
+        : frame.playerOneScore;
+      const newOpponentScore = opponentCurrentScore + foulPoints;
+
+      // Update frame: award points to opponent, switch turns, reset breaks
+      const updates = isPlayerOne
+        ? {
+            playerTwoScore: newOpponentScore,
+            currentPlayerTurn: opponentId,
+            playerOneBreak: 0,
+            playerTwoBreak: 0,
+          }
+        : {
+            playerOneScore: newOpponentScore,
+            currentPlayerTurn: opponentId,
+            playerOneBreak: 0,
+            playerTwoBreak: 0,
+          };
+
+      await updateFrameScore(frame.id, updates);
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: [...QUERY_KEYS.ACTIVE_FRAME, variables.gameId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: QUERY_KEYS.PLAYERS,
+      });
+    },
+  });
+}
+
 interface UndoShotParams {
   frame: Frame;
   gameId: number;

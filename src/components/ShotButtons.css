@@ -120,3 +120,20 @@
   background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
 }
 
+/* Free Ball styles - basic functional styling */
+.shot-buttons__freeball-indicator {
+  text-align: center;
+  padding: 0.5rem;
+  background: rgba(59, 130, 246, 0.2);
+  border-radius: 8px;
+  font-weight: bold;
+}
+
+.shot-buttons__freeball-option {
+  display: flex;
+  justify-content: center;
+}
+
+.shot-button.action.freeball {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+}

@@ -23,7 +23,7 @@ export const BALL_COLORS_ORDER = [
   "black",
 ] as const;
 
-export type BallType = keyof typeof BALL_POINTS | "foul";
+export type BallType = keyof typeof BALL_POINTS | "foul" | "freeball";
 export type ColorBallType = (typeof BALL_COLORS_ORDER)[number];
 
 export const GAME_STATUS = {

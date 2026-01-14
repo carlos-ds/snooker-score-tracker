@@ -8,7 +8,7 @@ import type { Frame, BallType } from "@/types";
 
 interface RecordShotParams {
   frame: Frame;
-  ballType: Exclude<BallType, "foul">;
+  ballType: Exclude<BallType, "foul" | "freeball">;
   gameId: number;
   playerOneId: number;
 }
@@ -208,6 +208,101 @@ export function useRecordFoul() {
       });
       queryClient.invalidateQueries({
         queryKey: QUERY_KEYS.PLAYERS,
+      });
+    },
+  });
+}
+
+interface EnableFreeBallParams {
+  frame: Frame;
+  gameId: number;
+}
+
+// Hook to enable Free Ball mode for the next shot
+export function useEnableFreeBall() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ frame }: EnableFreeBallParams) => {
+      if (!frame.id) {
+        throw new Error("Frame ID is required");
+      }
+
+      await updateFrameScore(frame.id, {
+        isFreeBall: true,
+      });
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: [...QUERY_KEYS.ACTIVE_FRAME, variables.gameId],
+      });
+    },
+  });
+}
+
+interface RecordFreeBallShotParams {
+  frame: Frame;
+  gameId: number;
+  playerOneId: number;
+}
+
+// Hook to record a Free Ball pot (scores 1 point, treated like potting a red)
+export function useRecordFreeBallShot() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      frame,
+      playerOneId,
+    }: RecordFreeBallShotParams) => {
+      if (!frame.id) {
+        throw new Error("Frame ID is required");
+      }
+
+      const currentPlayerId = frame.currentPlayerTurn;
+      const isPlayerOne = currentPlayerId === playerOneId;
+      const points = 1; // Free Ball always scores 1 point (like a red)
+
+      // Calculate new scores
+      const currentScore = isPlayerOne
+        ? frame.playerOneScore
+        : frame.playerTwoScore;
+      const currentBreak = isPlayerOne
+        ? frame.playerOneBreak
+        : frame.playerTwoBreak;
+
+      const newScore = currentScore + points;
+      const newBreak = currentBreak + points;
+
+      // Record shot as freeball type
+      await recordShot({
+        frameId: frame.id,
+        playerId: currentPlayerId,
+        ballType: "freeball",
+        points,
+        isFoul: false,
+      });
+
+      // Update frame - clear Free Ball flag, update scores
+      // Note: redsRemaining stays the same (the color is re-spotted)
+      const updates = {
+        ...(isPlayerOne
+          ? {
+              playerOneScore: newScore,
+              playerOneBreak: newBreak,
+            }
+          : {
+              playerTwoScore: newScore,
+              playerTwoBreak: newBreak,
+            }),
+        isFreeBall: false,
+      };
+
+      await updateFrameScore(frame.id, updates);
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: [...QUERY_KEYS.ACTIVE_FRAME, variables.gameId],
       });
     },
   });

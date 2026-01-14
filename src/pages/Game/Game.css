@@ -1,3 +1,13 @@
+.game-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.game-header .header {
+  flex: 1;
+}
+
 .game-main {
   display: flex;
   flex-direction: column;

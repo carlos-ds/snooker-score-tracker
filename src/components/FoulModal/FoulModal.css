@@ -52,3 +52,18 @@
   padding: 0.5rem;
   cursor: pointer;
 }
+
+.foul-modal__freeball {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  cursor: pointer;
+}
+
+.foul-modal__freeball input {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}

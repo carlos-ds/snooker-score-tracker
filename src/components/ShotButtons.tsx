@@ -5,6 +5,8 @@ import {
   useEndBreak,
   useUndoShot,
   useRecordFoul,
+  useEnableFreeBall,
+  useRecordFreeBallShot,
 } from "@/features/shot/useShotHooks";
 import { getShotsByFrame } from "@/features/shot/operations";
 import { BALL_COLORS_ORDER } from "@/config/constants";
@@ -30,9 +32,12 @@ function ShotButtons({
   const endBreakMutation = useEndBreak();
   const undoMutation = useUndoShot();
   const recordFoulMutation = useRecordFoul();
+  const enableFreeBallMutation = useEnableFreeBall();
+  const recordFreeBallShotMutation = useRecordFreeBallShot();
 
   const [hasShotsToUndo, setHasShotsToUndo] = useState(false);
   const [lastShotWasRed, setLastShotWasRed] = useState(false);
+  const [lastShotWasFreeBall, setLastShotWasFreeBall] = useState(false);
   const [isLastRedColorChoice, setIsLastRedColorChoice] = useState(false);
   const [strictOrderIndex, setStrictOrderIndex] = useState(0);
   const [isFrameComplete, setIsFrameComplete] = useState(false);
@@ -49,6 +54,7 @@ function ShotButtons({
 
       if (!lastShot || lastShot.playerId !== frame.currentPlayerTurn) {
         setLastShotWasRed(false);
+        setLastShotWasFreeBall(false);
       } else {
         const lastNonFoulShotByCurrentPlayer = [...shots]
           .reverse()
@@ -58,6 +64,7 @@ function ShotButtons({
           );
 
         setLastShotWasRed(lastNonFoulShotByCurrentPlayer?.ballType === "red");
+        setLastShotWasFreeBall(lastNonFoulShotByCurrentPlayer?.ballType === "freeball");
       }
 
       const isLastRedJustPotted =
@@ -134,7 +141,7 @@ function ShotButtons({
     }
   };
 
-  const handleFoul = async (foulPoints: number) => {
+  const handleFoul = async (foulPoints: number, isFreeBall: boolean) => {
     try {
       await recordFoulMutation.mutateAsync({
         frame,
@@ -143,9 +150,30 @@ function ShotButtons({
         playerOneId,
         playerTwoId,
       });
+      
+      // If free ball was checked, enable it
+      if (isFreeBall) {
+        await enableFreeBallMutation.mutateAsync({
+          frame,
+          gameId,
+        });
+      }
+      
       setIsFoulModalOpen(false);
     } catch (error) {
       console.error("Failed to record foul:", error);
+    }
+  };
+
+  const handleFreeBallPot = async () => {
+    try {
+      await recordFreeBallShotMutation.mutateAsync({
+        frame,
+        gameId,
+        playerOneId,
+      });
+    } catch (error) {
+      console.error("Failed to record free ball:", error);
     }
   };
 
@@ -168,10 +196,10 @@ function ShotButtons({
   const redEnabled = isRedsPhase && !recordShotMutation.isPending;
 
   const computeColorEnabled = (color: (typeof BALL_COLORS_ORDER)[number]) => {
-    if (recordShotMutation.isPending) return false;
+    if (recordShotMutation.isPending || recordFreeBallShotMutation.isPending) return false;
 
     if (isRedsPhase) {
-      return lastShotWasRed;
+      return lastShotWasRed || lastShotWasFreeBall;
     }
 
     if (isLastRedColorChoice) {
@@ -190,54 +218,75 @@ function ShotButtons({
 
   return (
     <div className="shot-buttons">
-      <div className="shot-buttons__reds">
-        <button 
-          className="shot-button red"
-          onClick={() => handlePot("red")} 
-          disabled={!redEnabled}
-        >
-          <span className="shot-button-points">({frame.redsRemaining})</span>
-        </button>
-      </div>
+      {/* Free Ball mode: show all colors enabled */}
+      {frame.isFreeBall && (
+        <div className="shot-buttons__colors">
+          {BALL_COLORS_ORDER.map((color) => (
+            <button
+              key={color}
+              className={`shot-button ${color}`}
+              onClick={handleFreeBallPot}
+              disabled={recordFreeBallShotMutation.isPending}
+            >
+              <span className="shot-button-points">+1</span>
+            </button>
+          ))}
+        </div>
+      )}
 
-      <div className="shot-buttons__colors">
-        <button 
-          className="shot-button yellow"
-          onClick={() => handlePot("yellow")} 
-          disabled={!yellowEnabled}
-        >
-        </button>
-        <button 
-          className="shot-button green"
-          onClick={() => handlePot("green")} 
-          disabled={!greenEnabled}
-        >
-        </button>
-        <button 
-          className="shot-button brown"
-          onClick={() => handlePot("brown")} 
-          disabled={!brownEnabled}
-        >
-        </button>
-        <button 
-          className="shot-button blue"
-          onClick={() => handlePot("blue")} 
-          disabled={!blueEnabled}
-        >
-        </button>
-        <button 
-          className="shot-button pink"
-          onClick={() => handlePot("pink")} 
-          disabled={!pinkEnabled}
-        >
-        </button>
-        <button 
-          className="shot-button black"
-          onClick={() => handlePot("black")} 
-          disabled={!blackEnabled}
-        >
-        </button>
-      </div>
+      {/* Normal mode */}
+      {!frame.isFreeBall && (
+        <>
+          <div className="shot-buttons__reds">
+            <button 
+              className="shot-button red"
+              onClick={() => handlePot("red")} 
+              disabled={!redEnabled}
+            >
+              <span className="shot-button-points">({frame.redsRemaining})</span>
+            </button>
+          </div>
+
+          <div className="shot-buttons__colors">
+            <button 
+              className="shot-button yellow"
+              onClick={() => handlePot("yellow")} 
+              disabled={!yellowEnabled}
+            >
+            </button>
+            <button 
+              className="shot-button green"
+              onClick={() => handlePot("green")} 
+              disabled={!greenEnabled}
+            >
+            </button>
+            <button 
+              className="shot-button brown"
+              onClick={() => handlePot("brown")} 
+              disabled={!brownEnabled}
+            >
+            </button>
+            <button 
+              className="shot-button blue"
+              onClick={() => handlePot("blue")} 
+              disabled={!blueEnabled}
+            >
+            </button>
+            <button 
+              className="shot-button pink"
+              onClick={() => handlePot("pink")} 
+              disabled={!pinkEnabled}
+            >
+            </button>
+            <button 
+              className="shot-button black"
+              onClick={() => handlePot("black")} 
+              disabled={!blackEnabled}
+            >
+            </button>
+          </div>
+        </>
+      )}
 
       <div className="shot-buttons__actions">
         {isFrameComplete && (
@@ -278,8 +327,8 @@ function ShotButtons({
       <FoulModal
         isOpen={isFoulModalOpen}
         onClose={() => setIsFoulModalOpen(false)}
-        onSelectFoulPoints={handleFoul}
-        isPending={recordFoulMutation.isPending}
+        onSelectFoul={handleFoul}
+        isPending={recordFoulMutation.isPending || enableFreeBallMutation.isPending}
       />
     </div>
   );

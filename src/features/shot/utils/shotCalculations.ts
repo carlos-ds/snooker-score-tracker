@@ -117,8 +117,8 @@ export function isBallAllowed(
 
   // Color ball logic
   if (isRedsPhase) {
-    // During reds phase, colors only allowed after potting a red
-    return lastBallType === "red";
+    // During reds phase, colors only allowed after potting a red or freeball
+    return lastBallType === "red" || lastBallType === "freeball";
   }
 
   // Last red just potted - free choice of any color

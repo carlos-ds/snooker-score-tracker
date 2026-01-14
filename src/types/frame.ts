@@ -8,6 +8,7 @@ export interface Frame {
   playerOneBreak: number;
   playerTwoBreak: number;
   redsRemaining: number;
+  isFreeBall: boolean;
   status: FrameStatus;
   winnerId?: number;
   createdAt: Date;
@@ -31,5 +32,6 @@ export type FrameScoreUpdate = Partial<
     | "playerTwoBreak"
     | "redsRemaining"
     | "currentPlayerTurn"
+    | "isFreeBall"
   >
 >;

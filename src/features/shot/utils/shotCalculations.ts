@@ -20,8 +20,16 @@ export function recalculateFrameState(
 
   // Replay all shots to recalculate state
   for (const shot of shots) {
-    // Skip foul markers for scoring
-    if (shot.ballType !== "foul") {
+    // Handle foul shots - award foul points to opponent
+    if (shot.ballType === "foul" && shot.isFoul && shot.foulPoints) {
+      // Foul points go to the opponent of the fouling player
+      if (shot.playerId === playerOneId) {
+        playerTwoScore += shot.foulPoints;
+      } else {
+        playerOneScore += shot.foulPoints;
+      }
+    } else if (shot.ballType !== "foul") {
+      // Regular shot (non-foul)
       // Decrement reds counter
       if (shot.ballType === "red") {
         redsRemaining--;

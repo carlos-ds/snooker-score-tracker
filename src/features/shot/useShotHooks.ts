@@ -229,3 +229,66 @@ export function useUndoShot() {
     },
   });
 }
+
+interface RecordFoulParams {
+  frame: Frame;
+  foulPoints: number;
+  gameId: number;
+  playerOneId: number;
+  playerTwoId: number;
+}
+
+// Hook to record a foul and award points to the opponent.
+export function useRecordFoul() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      frame,
+      foulPoints,
+      playerOneId,
+      playerTwoId,
+    }: RecordFoulParams) => {
+      if (!frame.id) {
+        throw new Error("Frame ID is required");
+      }
+
+      const currentPlayerId = frame.currentPlayerTurn;
+      const isPlayerOne = currentPlayerId === playerOneId;
+      const opponentId = isPlayerOne ? playerTwoId : playerOneId;
+
+      // Record the foul shot
+      await recordShot({
+        frameId: frame.id,
+        playerId: currentPlayerId,
+        ballType: "foul",
+        points: 0,
+        isFoul: true,
+        foulPoints,
+      });
+
+      // Award foul points to opponent's score
+      const newOpponentScore = isPlayerOne
+        ? frame.playerTwoScore + foulPoints
+        : frame.playerOneScore + foulPoints;
+
+      // Update frame: switch turn, reset breaks, add points to opponent
+      const updates = {
+        currentPlayerTurn: opponentId,
+        playerOneBreak: 0,
+        playerTwoBreak: 0,
+        ...(isPlayerOne
+          ? { playerTwoScore: newOpponentScore }
+          : { playerOneScore: newOpponentScore }),
+      };
+
+      await updateFrameScore(frame.id, updates);
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: [...QUERY_KEYS.ACTIVE_FRAME, variables.gameId],
+      });
+    },
+  });
+}
+

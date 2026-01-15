@@ -4,9 +4,11 @@ import {
   useRecordShot,
   useEndBreak,
   useUndoShot,
+  useRecordFoul,
 } from "@/features/shot/useShotHooks";
 import { getShotsByFrame } from "@/features/shot/operations";
 import { BALL_COLORS_ORDER } from "@/config/constants";
+import FoulModal from "@/components/FoulModal/FoulModal";
 
 interface ShotButtonsProps {
   frame: Frame;
@@ -26,11 +28,13 @@ function ShotButtons({
   const recordShotMutation = useRecordShot();
   const endBreakMutation = useEndBreak();
   const undoMutation = useUndoShot();
+  const recordFoulMutation = useRecordFoul();
 
   const [hasShotsToUndo, setHasShotsToUndo] = useState(false);
   const [lastShotWasRed, setLastShotWasRed] = useState(false);
   const [isLastRedColorChoice, setIsLastRedColorChoice] = useState(false);
   const [strictOrderIndex, setStrictOrderIndex] = useState(0);
+  const [showFoulModal, setShowFoulModal] = useState(false);
 
   useEffect(() => {
     const updateShotState = async () => {
@@ -142,6 +146,20 @@ function ShotButtons({
     }
   };
 
+  const handleFoul = async (foulPoints: number) => {
+    try {
+      await recordFoulMutation.mutateAsync({
+        frame,
+        foulPoints,
+        gameId,
+        playerOneId,
+        playerTwoId,
+      });
+    } catch (error) {
+      console.error("Failed to record foul:", error);
+    }
+  };
+
   const isColorAllowedInStrictOrder = (colorName: string) => {
     if (!isStrictOrderPhase) return true;
     return BALL_COLORS_ORDER[strictOrderIndex] === colorName;
@@ -205,12 +223,25 @@ function ShotButtons({
         </button>
 
         <button
+          onClick={() => setShowFoulModal(true)}
+          disabled={recordFoulMutation.isPending}
+        >
+          {recordFoulMutation.isPending ? "Recording..." : "Foul"}
+        </button>
+
+        <button
           onClick={handleUndo}
           disabled={undoMutation.isPending || !hasShotsToUndo}
         >
           {undoMutation.isPending ? "Undoing..." : "Undo"}
         </button>
       </div>
+
+      <FoulModal
+        isOpen={showFoulModal}
+        onClose={() => setShowFoulModal(false)}
+        onSelectFoul={handleFoul}
+      />
     </div>
   );
 }

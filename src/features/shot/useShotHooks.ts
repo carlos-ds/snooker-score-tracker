@@ -1,7 +1,8 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { QUERY_KEYS, BALL_POINTS } from "@/config/constants";
 import { recordShot, deleteLastShot, getShotsByFrame } from "./operations";
-import { updateFrameScore } from "@/features/frame/operations";
+import { updateFrameScore, completeFrame, getFramesByGame, createFrame } from "@/features/frame/operations";
+import { getGameById, completeActiveGame } from "@/features/game/operations";
 import { recalculateFrameState } from "./utils/shotCalculations";
 import type { Frame, BallType } from "@/types";
 
@@ -21,6 +22,7 @@ export function useRecordShot() {
       frame,
       ballType,
       playerOneId,
+      gameId,
     }: RecordShotParams) => {
       if (!frame.id) {
         throw new Error("Frame ID is required");
@@ -67,11 +69,65 @@ export function useRecordShot() {
       };
 
       await updateFrameScore(frame.id, updates);
+
+      // --- Check for Final Black Frame Completion ---
+      // "A frame usually ends when the final black ball is potted, provided the scores are not tied."
+      if (ballType === "black" && frame.redsRemaining === 0) {
+        // Fetch shots to verify this is the Final Black (clearance phase) and not a Black-after-Red
+        const shots = await getShotsByFrame(frame.id);
+        
+        // If it's the only shot (rare) or the previous shot was NOT a red, it's the Final Black.
+        // (If previous shot was Red, this is a Color-After-Red, so frame continues).
+        const isFinalBlack = shots.length === 1 || (shots.length >= 2 && shots[shots.length - 2].ballType !== "red");
+
+        if (isFinalBlack) {
+          const finalP1Score = isPlayerOne ? newScore : frame.playerOneScore;
+          const finalP2Score = isPlayerOne ? frame.playerTwoScore : newScore;
+
+          // Only end if scores are not tied
+          if (finalP1Score !== finalP2Score) {
+            // Retrieve game info for player specifics
+            const game = await getGameById(gameId);
+            if (game) {
+               const winnerId = finalP1Score > finalP2Score ? playerOneId : game.playerTwoId;
+               
+               // Complete the Frame
+               await completeFrame(frame.id, winnerId);
+
+               // --- Check for Match Win ---
+               // Get updated list of frames to count wins
+               const allFrames = await getFramesByGame(gameId);
+               
+               const p1Wins = allFrames.filter(f => f.winnerId === playerOneId).length;
+               const p2Wins = allFrames.filter(f => f.winnerId === game.playerTwoId).length;
+               const winsNeeded = Math.ceil(game.bestOfFrames / 2);
+
+               if (p1Wins >= winsNeeded || p2Wins >= winsNeeded) {
+                 await completeActiveGame();
+               } else {
+                 // Match not over yet - create next frame
+                 const nextFrameNumber = allFrames.length + 1;
+                 // Loser of previous frame breaks first (standard snooker rule)
+                 const nextStartingPlayer = winnerId === playerOneId ? game.playerTwoId : playerOneId;
+                 await createFrame({
+                   gameId,
+                   frameNumber: nextFrameNumber,
+                   startingPlayerId: nextStartingPlayer,
+                   redsCount: game.redsCount,
+                 });
+               }
+            }
+          }
+        }
+      }
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
         queryKey: [...QUERY_KEYS.ACTIVE_FRAME, variables.gameId],
       });
+      // Also invalidate Game queries in case status changed
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ACTIVE_GAME });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.GAME_FRAMES });
     },
   });
 }

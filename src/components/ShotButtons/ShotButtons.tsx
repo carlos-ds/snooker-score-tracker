@@ -60,18 +60,36 @@ function ShotButtons({
       setIsLastRedColorChoice(isLastRedJustPotted);
 
       if (frame.redsRemaining === 0 && !isLastRedJustPotted) {
-        let colorsPottedAfterReds = 0;
+        let strictOrderColorsPotted = 0;
         let redsCount = initialRedsCount;
+        let lastRedPotterId: number | null = null;
+        let freeColorUsed = false;
+        let breakEndedAfterLastRed = false;
 
         for (const shot of shots) {
           if (shot.ballType === "red") {
             redsCount--;
+            if (redsCount === 0) {
+              // Track who potted the last red
+              lastRedPotterId = shot.playerId;
+              breakEndedAfterLastRed = false;
+            }
+          } else if (shot.ballType === "foul" && redsCount <= 0) {
+            // A foul/break-end after the last red forfeits the free colour choice
+            breakEndedAfterLastRed = true;
           } else if (shot.ballType !== "foul" && redsCount <= 0) {
-            colorsPottedAfterReds++;
+            // Colour potted after all reds are gone
+            // Only count as free choice if: same player who potted last red AND no break ended
+            if (!freeColorUsed && !breakEndedAfterLastRed && shot.playerId === lastRedPotterId) {
+              freeColorUsed = true;
+            } else {
+              // All other colours are strict order
+              strictOrderColorsPotted++;
+            }
           }
         }
 
-        setStrictOrderIndex(Math.max(0, colorsPottedAfterReds - 1));
+        setStrictOrderIndex(strictOrderColorsPotted);
       }
     };
 

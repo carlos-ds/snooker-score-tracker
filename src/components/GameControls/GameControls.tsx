@@ -1,5 +1,4 @@
 import {
-  usePlayers,
   useDeleteAllPlayers,
 } from "@/features/player/usePlayerHooks";
 import {
@@ -11,7 +10,6 @@ import { useNavigate } from "@tanstack/react-router";
 
 function GameControls() {
   const navigate = useNavigate();
-  const { data: players = [] } = usePlayers();
   const { data: activeGame } = useActiveGame();
 
   const resetGameDataMutation = useResetGameData();
@@ -47,37 +45,27 @@ function GameControls() {
     }
   };
 
-  if (activeGame) {
-    const playerOne = players.find((p) => p.id === activeGame.playerOneId);
-    const playerTwo = players.find((p) => p.id === activeGame.playerTwoId);
-
-    const isStarting =
-      resetGameDataMutation.isPending || createGameMutation.isPending;
-    const isEnding =
-      resetGameDataMutation.isPending || deleteAllPlayersMutation.isPending;
-
-    return (
-      <>
-        <h2>Game in Progress</h2>
-        <p>
-          {playerOne?.name || "Player 1"} vs {playerTwo?.name || "Player 2"}
-        </p>
-        <p>Started: {activeGame.createdAt.toLocaleString()}</p>
-
-        <div>
-          <button onClick={handlePlayAgain} disabled={isStarting}>
-            {isStarting ? "Starting..." : "Play Again"}
-          </button>
-
-          <button onClick={handleNewGame} disabled={isEnding}>
-            End Game
-          </button>
-        </div>
-      </>
-    );
+  if (!activeGame || activeGame.status !== "completed") {
+    return null;
   }
 
-  return null;
+  const isStarting =
+    resetGameDataMutation.isPending || createGameMutation.isPending;
+  const isEnding =
+    resetGameDataMutation.isPending || deleteAllPlayersMutation.isPending;
+
+  return (
+    <div>
+      <button onClick={handlePlayAgain} disabled={isStarting}>
+        {isStarting ? "Starting..." : "Play Again"}
+      </button>
+
+      <button onClick={handleNewGame} disabled={isEnding}>
+        {isEnding ? "Ending..." : "New Game"}
+      </button>
+    </div>
+  );
 }
 
 export default GameControls;
+

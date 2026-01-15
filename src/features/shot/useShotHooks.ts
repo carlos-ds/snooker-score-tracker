@@ -127,6 +127,7 @@ interface UndoShotParams {
   gameId: number;
   playerOneId: number;
   playerTwoId: number;
+  initialRedsCount: number;
 }
 
 // Hook to undo the last shot and recalculate frame state.
@@ -134,7 +135,12 @@ export function useUndoShot() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ frame, playerOneId, playerTwoId }: UndoShotParams) => {
+    mutationFn: async ({
+      frame,
+      playerOneId,
+      playerTwoId,
+      initialRedsCount,
+    }: UndoShotParams) => {
       if (!frame.id) {
         throw new Error("Frame ID is required");
       }
@@ -154,7 +160,8 @@ export function useUndoShot() {
         remainingShots,
         playerOneId,
         playerTwoId,
-        playerOneId // Initial turn is player one
+        playerOneId, // Initial turn is player one
+        initialRedsCount
       );
 
       await updateFrameScore(frame.id, updates);

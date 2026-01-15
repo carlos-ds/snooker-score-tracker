@@ -1,11 +1,12 @@
 import type { Frame, Player } from "@/types";
-import ShotButtons from "./ShotButtons";
+import ShotButtons from "@/components/ShotButtons";
 
 interface FrameDisplayProps {
   frame: Frame;
   playerOne: Player;
   playerTwo: Player;
   gameId: number;
+  redsCount: number;
 }
 
 function FrameDisplay({
@@ -13,6 +14,7 @@ function FrameDisplay({
   playerOne,
   playerTwo,
   gameId,
+  redsCount,
 }: FrameDisplayProps) {
   const isPlayerOneTurn = frame.currentPlayerTurn === playerOne.id;
 
@@ -41,6 +43,7 @@ function FrameDisplay({
         gameId={gameId}
         playerOneId={playerOne.id!}
         playerTwoId={playerTwo.id!}
+        initialRedsCount={redsCount}
       />
     </div>
   );

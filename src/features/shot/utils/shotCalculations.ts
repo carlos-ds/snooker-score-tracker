@@ -8,13 +8,14 @@ export function recalculateFrameState(
   shots: Shot[],
   playerOneId: number,
   playerTwoId: number,
-  initialTurn: number
+  initialTurn: number,
+  initialRedsCount: number
 ): FrameScoreUpdate {
   let playerOneScore = SNOOKER_RULES.INITIAL_SCORE;
   let playerTwoScore = SNOOKER_RULES.INITIAL_SCORE;
   let playerOneBreak: number = SNOOKER_RULES.INITIAL_BREAK;
   let playerTwoBreak: number = SNOOKER_RULES.INITIAL_BREAK;
-  let redsRemaining = SNOOKER_RULES.INITIAL_REDS;
+  let redsRemaining = initialRedsCount;
   let currentPlayerTurn = initialTurn;
 
   // Replay all shots to recalculate state

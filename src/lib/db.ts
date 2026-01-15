@@ -10,7 +10,7 @@ const db = new Dexie("SnookerScoreTrackerDB") as Dexie & {
 
 db.version(1).stores({
   players: "++id, name",
-  games: "++id, status, createdAt",
+  games: "++id, status, createdAt, redsCount, bestOfFrames",
   frames: "++id, gameId, status, frameNumber",
   shots: "++id, frameId, playerId, timestamp",
 });

@@ -13,6 +13,7 @@ interface ShotButtonsProps {
   gameId: number;
   playerOneId: number;
   playerTwoId: number;
+  initialRedsCount: number;
 }
 
 function ShotButtons({
@@ -20,6 +21,7 @@ function ShotButtons({
   gameId,
   playerOneId,
   playerTwoId,
+  initialRedsCount,
 }: ShotButtonsProps) {
   const recordShotMutation = useRecordShot();
   const endBreakMutation = useEndBreak();
@@ -59,12 +61,12 @@ function ShotButtons({
 
       if (frame.redsRemaining === 0 && !isLastRedJustPotted) {
         let colorsPottedAfterReds = 0;
-        let redsCount = 15;
+        let redsCount = initialRedsCount;
 
         for (const shot of shots) {
           if (shot.ballType === "red") {
             redsCount--;
-          } else if (shot.ballType !== "foul" && redsCount === 0) {
+          } else if (shot.ballType !== "foul" && redsCount <= 0) {
             colorsPottedAfterReds++;
           }
         }
@@ -74,7 +76,7 @@ function ShotButtons({
     };
 
     void updateShotState();
-  }, [frame]);
+  }, [frame, initialRedsCount]);
 
   const isRedsPhase = frame.redsRemaining > 0;
   const isStrictOrderPhase = !isRedsPhase && !isLastRedColorChoice;
@@ -115,6 +117,7 @@ function ShotButtons({
         gameId,
         playerOneId,
         playerTwoId,
+        initialRedsCount,
       });
     } catch (error) {
       console.error("Failed to undo:", error);
@@ -153,7 +156,7 @@ function ShotButtons({
     <div>
       <div>
         <button onClick={() => handlePot("red")} disabled={!redEnabled}>
-          Red (1)
+          Red ({frame.redsRemaining})
         </button>
       </div>
 

@@ -20,6 +20,7 @@ export interface CreateFrameInput {
   gameId: number;
   frameNumber: number;
   startingPlayerId: number;
+  redsCount: number;
 }
 
 export type FrameScoreUpdate = Partial<

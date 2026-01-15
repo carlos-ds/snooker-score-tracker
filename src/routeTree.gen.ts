@@ -9,20 +9,9 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as GameRouteImport } from './routes/game'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as SetupPlayersRouteImport } from './routes/setup.players'
-import { Route as SetupModesRouteImport } from './routes/setup.modes'
-import { Route as SetupFramesRouteImport } from './routes/setup.frames'
-import { Route as SetupBallsRouteImport } from './routes/setup.balls'
-import { Route as GameStatisticsRouteImport } from './routes/game.statistics'
 
-const SettingsRoute = SettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const GameRoute = GameRouteImport.update({
   id: '/game',
   path: '/game',
@@ -33,115 +22,35 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SetupPlayersRoute = SetupPlayersRouteImport.update({
-  id: '/setup/players',
-  path: '/setup/players',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SetupModesRoute = SetupModesRouteImport.update({
-  id: '/setup/modes',
-  path: '/setup/modes',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SetupFramesRoute = SetupFramesRouteImport.update({
-  id: '/setup/frames',
-  path: '/setup/frames',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SetupBallsRoute = SetupBallsRouteImport.update({
-  id: '/setup/balls',
-  path: '/setup/balls',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const GameStatisticsRoute = GameStatisticsRouteImport.update({
-  id: '/statistics',
-  path: '/statistics',
-  getParentRoute: () => GameRoute,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/game': typeof GameRouteWithChildren
-  '/settings': typeof SettingsRoute
-  '/game/statistics': typeof GameStatisticsRoute
-  '/setup/balls': typeof SetupBallsRoute
-  '/setup/frames': typeof SetupFramesRoute
-  '/setup/modes': typeof SetupModesRoute
-  '/setup/players': typeof SetupPlayersRoute
+  '/game': typeof GameRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/game': typeof GameRouteWithChildren
-  '/settings': typeof SettingsRoute
-  '/game/statistics': typeof GameStatisticsRoute
-  '/setup/balls': typeof SetupBallsRoute
-  '/setup/frames': typeof SetupFramesRoute
-  '/setup/modes': typeof SetupModesRoute
-  '/setup/players': typeof SetupPlayersRoute
+  '/game': typeof GameRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/game': typeof GameRouteWithChildren
-  '/settings': typeof SettingsRoute
-  '/game/statistics': typeof GameStatisticsRoute
-  '/setup/balls': typeof SetupBallsRoute
-  '/setup/frames': typeof SetupFramesRoute
-  '/setup/modes': typeof SetupModesRoute
-  '/setup/players': typeof SetupPlayersRoute
+  '/game': typeof GameRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    | '/'
-    | '/game'
-    | '/settings'
-    | '/game/statistics'
-    | '/setup/balls'
-    | '/setup/frames'
-    | '/setup/modes'
-    | '/setup/players'
+  fullPaths: '/' | '/game'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/game'
-    | '/settings'
-    | '/game/statistics'
-    | '/setup/balls'
-    | '/setup/frames'
-    | '/setup/modes'
-    | '/setup/players'
-  id:
-    | '__root__'
-    | '/'
-    | '/game'
-    | '/settings'
-    | '/game/statistics'
-    | '/setup/balls'
-    | '/setup/frames'
-    | '/setup/modes'
-    | '/setup/players'
+  to: '/' | '/game'
+  id: '__root__' | '/' | '/game'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  GameRoute: typeof GameRouteWithChildren
-  SettingsRoute: typeof SettingsRoute
-  SetupBallsRoute: typeof SetupBallsRoute
-  SetupFramesRoute: typeof SetupFramesRoute
-  SetupModesRoute: typeof SetupModesRoute
-  SetupPlayersRoute: typeof SetupPlayersRoute
+  GameRoute: typeof GameRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/settings': {
-      id: '/settings'
-      path: '/settings'
-      fullPath: '/settings'
-      preLoaderRoute: typeof SettingsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/game': {
       id: '/game'
       path: '/game'
@@ -156,62 +65,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/setup/players': {
-      id: '/setup/players'
-      path: '/setup/players'
-      fullPath: '/setup/players'
-      preLoaderRoute: typeof SetupPlayersRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/setup/modes': {
-      id: '/setup/modes'
-      path: '/setup/modes'
-      fullPath: '/setup/modes'
-      preLoaderRoute: typeof SetupModesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/setup/frames': {
-      id: '/setup/frames'
-      path: '/setup/frames'
-      fullPath: '/setup/frames'
-      preLoaderRoute: typeof SetupFramesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/setup/balls': {
-      id: '/setup/balls'
-      path: '/setup/balls'
-      fullPath: '/setup/balls'
-      preLoaderRoute: typeof SetupBallsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/game/statistics': {
-      id: '/game/statistics'
-      path: '/statistics'
-      fullPath: '/game/statistics'
-      preLoaderRoute: typeof GameStatisticsRouteImport
-      parentRoute: typeof GameRoute
-    }
   }
 }
 
-interface GameRouteChildren {
-  GameStatisticsRoute: typeof GameStatisticsRoute
-}
-
-const GameRouteChildren: GameRouteChildren = {
-  GameStatisticsRoute: GameStatisticsRoute,
-}
-
-const GameRouteWithChildren = GameRoute._addFileChildren(GameRouteChildren)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  GameRoute: GameRouteWithChildren,
-  SettingsRoute: SettingsRoute,
-  SetupBallsRoute: SetupBallsRoute,
-  SetupFramesRoute: SetupFramesRoute,
-  SetupModesRoute: SetupModesRoute,
-  SetupPlayersRoute: SetupPlayersRoute,
+  GameRoute: GameRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -7,8 +7,10 @@ import {
   useResetGameData,
   useCreateGame,
 } from "@/features/game/useGameHooks";
+import { useNavigate } from "@tanstack/react-router";
 
 function GameControls() {
+  const navigate = useNavigate();
   const { data: players = [] } = usePlayers();
   const { data: activeGame } = useActiveGame();
 
@@ -25,6 +27,8 @@ function GameControls() {
       await createGameMutation.mutateAsync({
         playerOneId: activeGame.playerOneId,
         playerTwoId: activeGame.playerTwoId,
+        redsCount: activeGame.redsCount ?? 15,
+        bestOfFrames: activeGame.bestOfFrames ?? 1,
       });
     } catch (error) {
       console.error("Failed to start new game:", error);
@@ -37,6 +41,7 @@ function GameControls() {
         resetGameDataMutation.mutateAsync(),
         deleteAllPlayersMutation.mutateAsync(),
       ]);
+      navigate({ to: "/" });
     } catch (error) {
       console.error("Failed to reset all:", error);
     }

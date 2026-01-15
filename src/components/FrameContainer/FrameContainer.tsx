@@ -1,7 +1,7 @@
 import { useActiveGame } from "@/features/game/useGameHooks";
 import { useActiveFrame } from "@/features/frame/useFrameHooks";
 import { usePlayers } from "@/features/player/usePlayerHooks";
-import FrameDisplay from "./FrameDisplay";
+import FrameDisplay from "@/components/FrameDisplay";
 
 function FrameContainer() {
   const { data: activeGame } = useActiveGame();
@@ -30,6 +30,7 @@ function FrameContainer() {
         playerOne={playerOne}
         playerTwo={playerTwo}
         gameId={activeGame.id!}
+        redsCount={activeGame.redsCount ?? 15}
       />
     );
   }

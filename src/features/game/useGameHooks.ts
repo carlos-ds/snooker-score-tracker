@@ -40,6 +40,7 @@ export function useCreateGame() {
         gameId,
         frameNumber: 1,
         startingPlayerId: input.playerOneId,
+        redsCount: input.redsCount,
       });
 
       return gameId;

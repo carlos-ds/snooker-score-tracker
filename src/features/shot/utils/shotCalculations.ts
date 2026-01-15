@@ -19,9 +19,16 @@ export function recalculateFrameState(
 
   // Replay all shots to recalculate state
   for (const shot of shots) {
-    // Skip foul markers for scoring
-    if (shot.ballType !== "foul") {
-      // Decrement reds counter
+    // Handle foul shots - award foul points to opponent
+    if (shot.isFoul && shot.foulPoints) {
+      // Foul points go to the opponent of whoever committed the foul
+      if (shot.playerId === playerOneId) {
+        playerTwoScore += shot.foulPoints;
+      } else {
+        playerOneScore += shot.foulPoints;
+      }
+    } else if (shot.ballType !== "foul") {
+      // Regular pot - decrement reds counter if red
       if (shot.ballType === "red") {
         redsRemaining--;
       }
@@ -65,6 +72,7 @@ export function recalculateFrameState(
     playerTwoBreak,
     redsRemaining,
     currentPlayerTurn,
+    isFreeBall: false, // Undo clears any free ball state
   };
 }
 
@@ -110,8 +118,8 @@ export function isBallAllowed(
 
   // Color ball logic
   if (isRedsPhase) {
-    // During reds phase, colors only allowed after potting a red
-    return lastBallType === "red";
+    // During reds phase, colors only allowed after potting a red or freeball
+    return lastBallType === "red" || lastBallType === "freeball";
   }
 
   // Last red just potted - free choice of any color

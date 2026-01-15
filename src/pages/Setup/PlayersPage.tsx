@@ -1,4 +1,4 @@
-import AddPlayer from "@/components/AddPlayer";
+import AddPlayer from "@/components/AddPlayer/AddPlayer";
 import Header from "@/components/Header/Header";
 
 const PlayersPage = () => {

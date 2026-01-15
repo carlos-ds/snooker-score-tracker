@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { FOUL_BALLS } from "@/config/constants";
+import "@/components/ShotButtons/ShotButtons.css";
 import "./FoulModal.css";
 
 interface FoulModalProps {
@@ -31,41 +32,38 @@ function FoulModal({
   };
 
   return (
-    <div className="foul-modal-backdrop" onClick={handleBackdropClick}>
-      <div className="foul-modal">
-        <div className="foul-modal__header">
-          <h2 className="foul-modal__title">Foul</h2>
-          <p className="foul-modal__subtitle">Select the ball involved</p>
-        </div>
+    <div className="foul-modal__backdrop" onClick={handleBackdropClick}>
+      <div className="foul-modal__content">
+        <h2>Foul</h2>
+        <p>Select the ball involved</p>
 
-        <div className="foul-modal__balls">
+        <div className="shot-buttons__balls">
           {FOUL_BALLS.map((item) => (
             <button
               key={item.ball}
-              className={`foul-modal__ball ${item.ball}`}
+              className="shot-button"
               onClick={() => handleSelectBall(item.points)}
               disabled={isPending}
             >
-              <span className="foul-modal__ball-points">+{item.points}</span>
+              <span>{item.ball}</span>
+              <span>+{item.points}</span>
             </button>
           ))}
         </div>
 
-        <label className="foul-modal__freeball">
-          <input
-            type="checkbox"
-            checked={isFreeBall}
-            onChange={(e) => setIsFreeBall(e.target.checked)}
-            disabled={isPending}
-          />
-          <span>Free Ball</span>
-        </label>
+        <div>
+          <label>
+            <input
+              type="checkbox"
+              checked={isFreeBall}
+              onChange={(e) => setIsFreeBall(e.target.checked)}
+              disabled={isPending}
+            />
+            Free Ball
+          </label>
+        </div>
 
-        <button
-          className="foul-modal__cancel"
-          onClick={onClose}
-          disabled={isPending}
-        >
+        <button onClick={onClose} disabled={isPending}>
           Cancel
         </button>
       </div>

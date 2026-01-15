@@ -10,7 +10,7 @@ import {
 } from "@/features/shot/useShotHooks";
 import { getShotsByFrame } from "@/features/shot/operations";
 import { BALL_COLORS_ORDER } from "@/config/constants";
-import FoulModal from "./FoulModal/FoulModal";
+import FoulModal from "@/components/FoulModal/FoulModal";
 import "./ShotButtons.css";
 
 interface ShotButtonsProps {
@@ -18,7 +18,6 @@ interface ShotButtonsProps {
   gameId: number;
   playerOneId: number;
   playerTwoId: number;
-  onFrameComplete?: (winnerId: number) => void;
 }
 
 function ShotButtons({
@@ -26,7 +25,6 @@ function ShotButtons({
   gameId,
   playerOneId,
   playerTwoId,
-  onFrameComplete,
 }: ShotButtonsProps) {
   const recordShotMutation = useRecordShot();
   const endBreakMutation = useEndBreak();
@@ -40,7 +38,6 @@ function ShotButtons({
   const [lastShotWasFreeBall, setLastShotWasFreeBall] = useState(false);
   const [isLastRedColorChoice, setIsLastRedColorChoice] = useState(false);
   const [strictOrderIndex, setStrictOrderIndex] = useState(0);
-  const [isFrameComplete, setIsFrameComplete] = useState(false);
   const [isFoulModalOpen, setIsFoulModalOpen] = useState(false);
 
   useEffect(() => {
@@ -71,11 +68,6 @@ function ShotButtons({
         frame.redsRemaining === 0 && lastShot?.ballType === "red";
 
       setIsLastRedColorChoice(isLastRedJustPotted);
-
-      // Check if frame is complete: all reds potted and black just potted
-      const isBlackJustPotted = lastShot?.ballType === "black";
-      const frameComplete = frame.redsRemaining === 0 && isBlackJustPotted;
-      setIsFrameComplete(frameComplete);
 
       if (frame.redsRemaining === 0 && !isLastRedJustPotted) {
         let colorsPottedAfterReds = 0;
@@ -114,7 +106,6 @@ function ShotButtons({
     }
   };
 
-
   const handleEndBreak = async () => {
     try {
       await endBreakMutation.mutateAsync({
@@ -151,7 +142,6 @@ function ShotButtons({
         playerTwoId,
       });
       
-      // If free ball was checked, enable it
       if (isFreeBall) {
         await enableFreeBallMutation.mutateAsync({
           frame,
@@ -174,17 +164,6 @@ function ShotButtons({
       });
     } catch (error) {
       console.error("Failed to record free ball:", error);
-    }
-  };
-
-  const handleEndFrame = () => {
-    // Determine winner based on score
-    const winnerId = frame.playerOneScore > frame.playerTwoScore 
-      ? playerOneId 
-      : playerTwoId;
-    
-    if (onFrameComplete) {
-      onFrameComplete(winnerId);
     }
   };
 
@@ -217,110 +196,110 @@ function ShotButtons({
   const blackEnabled = computeColorEnabled("black");
 
   return (
-    <div className="shot-buttons">
-      {/* Free Ball mode: show all colors enabled */}
+    <div>
+      {/* Free Ball mode */}
       {frame.isFreeBall && (
-        <div className="shot-buttons__colors">
-          {BALL_COLORS_ORDER.map((color) => (
-            <button
-              key={color}
-              className={`shot-button ${color}`}
-              onClick={handleFreeBallPot}
-              disabled={recordFreeBallShotMutation.isPending}
-            >
-              <span className="shot-button-points">+1</span>
-            </button>
-          ))}
+        <div>
+          <p>Free Ball</p>
+          <div className="shot-buttons__balls">
+            {BALL_COLORS_ORDER.map((color) => (
+              <button
+                key={color}
+                className="shot-button"
+                onClick={handleFreeBallPot}
+                disabled={recordFreeBallShotMutation.isPending}
+              >
+                <span>{color}</span>
+                <span>+1</span>
+              </button>
+            ))}
+          </div>
         </div>
       )}
 
       {/* Normal mode */}
       {!frame.isFreeBall && (
-        <>
-          <div className="shot-buttons__reds">
-            <button 
-              className="shot-button red"
-              onClick={() => handlePot("red")} 
-              disabled={!redEnabled}
-            >
-              <span className="shot-button-points">({frame.redsRemaining})</span>
-            </button>
-          </div>
-
-          <div className="shot-buttons__colors">
-            <button 
-              className="shot-button yellow"
-              onClick={() => handlePot("yellow")} 
-              disabled={!yellowEnabled}
-            >
-            </button>
-            <button 
-              className="shot-button green"
-              onClick={() => handlePot("green")} 
-              disabled={!greenEnabled}
-            >
-            </button>
-            <button 
-              className="shot-button brown"
-              onClick={() => handlePot("brown")} 
-              disabled={!brownEnabled}
-            >
-            </button>
-            <button 
-              className="shot-button blue"
-              onClick={() => handlePot("blue")} 
-              disabled={!blueEnabled}
-            >
-            </button>
-            <button 
-              className="shot-button pink"
-              onClick={() => handlePot("pink")} 
-              disabled={!pinkEnabled}
-            >
-            </button>
-            <button 
-              className="shot-button black"
-              onClick={() => handlePot("black")} 
-              disabled={!blackEnabled}
-            >
-            </button>
-          </div>
-        </>
+        <div className="shot-buttons__balls">
+          <button 
+            className="shot-button"
+            onClick={() => handlePot("red")} 
+            disabled={!redEnabled}
+          >
+            <span>Red</span>
+            <span>1 ({frame.redsRemaining})</span>
+          </button>
+          <button 
+            className="shot-button"
+            onClick={() => handlePot("yellow")} 
+            disabled={!yellowEnabled}
+          >
+            <span>Yellow</span>
+            <span>2</span>
+          </button>
+          <button 
+            className="shot-button"
+            onClick={() => handlePot("green")} 
+            disabled={!greenEnabled}
+          >
+            <span>Green</span>
+            <span>3</span>
+          </button>
+          <button 
+            className="shot-button"
+            onClick={() => handlePot("brown")} 
+            disabled={!brownEnabled}
+          >
+            <span>Brown</span>
+            <span>4</span>
+          </button>
+          <button 
+            className="shot-button"
+            onClick={() => handlePot("blue")} 
+            disabled={!blueEnabled}
+          >
+            <span>Blue</span>
+            <span>5</span>
+          </button>
+          <button 
+            className="shot-button"
+            onClick={() => handlePot("pink")} 
+            disabled={!pinkEnabled}
+          >
+            <span>Pink</span>
+            <span>6</span>
+          </button>
+          <button 
+            className="shot-button"
+            onClick={() => handlePot("black")} 
+            disabled={!blackEnabled}
+          >
+            <span>Black</span>
+            <span>7</span>
+          </button>
+          <button
+            className="shot-button"
+            onClick={() => setIsFoulModalOpen(true)}
+            disabled={recordFoulMutation.isPending}
+          >
+            <span>!</span>
+            <span>Foul</span>
+          </button>
+        </div>
       )}
 
-      <div className="shot-buttons__actions">
-        {isFrameComplete && (
-          <button 
-            className="shot-button action"
-            onClick={handleEndFrame}
-            style={{ backgroundColor: '#16a34a' }}
-          >
-            End Frame
-          </button>
-        )}
-
+      <div>
         <button 
-          className="shot-button action"
           onClick={handleEndBreak} 
-          disabled={endBreakMutation.isPending || isFrameComplete}
+          disabled={endBreakMutation.isPending}
         >
           {endBreakMutation.isPending ? "Switching..." : "End Break"}
         </button>
 
         <button
-          className="shot-button action"
           onClick={handleUndo}
           disabled={undoMutation.isPending || !hasShotsToUndo}
         >
           {undoMutation.isPending ? "Undoing..." : "Undo"}
-        </button>
-
-        <button
-          className="shot-button action foul"
-          onClick={() => setIsFoulModalOpen(true)}
-          disabled={recordFoulMutation.isPending || isFrameComplete}
-        >
-          Foul
         </button>
       </div>
 

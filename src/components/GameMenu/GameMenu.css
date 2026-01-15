@@ -2,6 +2,18 @@
   position: relative;
 }
 
+.game-menu__dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 1rem;
+  min-width: 200px;
+  z-index: 100;
+}
+
 .game-menu__backdrop {
   position: fixed;
   top: 0;
@@ -9,11 +21,4 @@
   right: 0;
   bottom: 0;
   z-index: 99;
-}
-
-.game-menu__dropdown {
-  position: absolute;
-  top: 100%;
-  right: 0;
-  z-index: 100;
 }

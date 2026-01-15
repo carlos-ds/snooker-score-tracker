@@ -1,12 +1,12 @@
-import AddPlayer from "@/components/AddPlayer";
-import GameControls from "@/components/GameControls";
-import FrameContainer from "@/components/FrameContainer";
+import AddPlayer from "@/components/AddPlayer/AddPlayer";
+import GameMenu from "@/components/GameMenu/GameMenu";
+import FrameContainer from "@/components/FrameContainer/FrameContainer";
 
 function Home() {
   return (
     <>
+      <GameMenu />
       <AddPlayer />
-      <GameControls />
       <FrameContainer />
     </>
   );

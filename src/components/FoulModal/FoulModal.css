@@ -1,4 +1,4 @@
-.foul-modal-backdrop {
+.foul-modal__backdrop {
   position: fixed;
   top: 0;
   left: 0;
@@ -8,62 +8,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: 100;
 }
 
-.foul-modal {
-  background: var(--clr-surface, #fff);
+.foul-modal__content {
+  background: white;
   padding: 1rem;
   border-radius: 8px;
-}
-
-.foul-modal__balls {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  justify-content: center;
-  margin-bottom: 1rem;
-}
-
-.foul-modal__ball {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-}
-
-.foul-modal__ball:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.foul-modal__ball-points {
-  font-size: 12px;
-  font-weight: bold;
-}
-
-.foul-modal__cancel {
-  width: 100%;
-  padding: 0.5rem;
-  cursor: pointer;
-}
-
-.foul-modal__freeball {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
-  cursor: pointer;
-}
-
-.foul-modal__freeball input {
-  width: 18px;
-  height: 18px;
-  cursor: pointer;
 }

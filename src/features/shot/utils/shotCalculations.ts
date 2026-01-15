@@ -72,6 +72,7 @@ export function recalculateFrameState(
     playerTwoBreak,
     redsRemaining,
     currentPlayerTurn,
+    isFreeBall: false, // Undo clears any free ball state
   };
 }
 

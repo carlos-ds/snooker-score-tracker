@@ -1,8 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { QUERY_KEYS, BALL_POINTS } from "@/config/constants";
 import { recordShot, deleteLastShot, getShotsByFrame } from "./operations";
-import { updateFrameScore } from "@/features/frame/operations";
-import { updatePlayerHighestBreak } from "@/features/player/operations";
+import { updateFrameScore, completeFrame } from "@/features/frame/operations";
 import { recalculateFrameState } from "./utils/shotCalculations";
 import type { Frame, BallType } from "@/types";
 
@@ -53,7 +52,7 @@ export function useRecordShot() {
         isFoul: false,
       });
 
-      // Update frame
+      // Update frame scores
       const updates = {
         ...(isPlayerOne
           ? {
@@ -68,10 +67,32 @@ export function useRecordShot() {
       };
 
       await updateFrameScore(frame.id, updates);
+
+      // Check if frame is complete (black potted in strict order phase)
+      const isBlackPotted = ballType === "black";
+      const isStrictOrderPhase = frame.redsRemaining === 0;
+      
+      const wasAlreadyInStrictOrder = frame.redsRemaining === 0 && ballType !== "red";
+      
+      if (isBlackPotted && isStrictOrderPhase && wasAlreadyInStrictOrder) {
+        // Frame complete, determine winner by comparing final scores
+        const finalPlayerOneScore = isPlayerOne ? newScore : frame.playerOneScore;
+        const finalPlayerTwoScore = isPlayerOne ? frame.playerTwoScore : newScore;
+        
+        // Determine winner (higher score wins)
+        const winnerId = finalPlayerOneScore > finalPlayerTwoScore 
+          ? playerOneId 
+          : frame.currentPlayerTurn === playerOneId ? frame.currentPlayerTurn : playerOneId;
+        
+        await completeFrame(frame.id, winnerId);
+      }
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
         queryKey: [...QUERY_KEYS.ACTIVE_FRAME, variables.gameId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [...QUERY_KEYS.GAME_FRAMES, variables.gameId],
       });
     },
   });
@@ -96,9 +117,6 @@ export function useEndBreak() {
 
       const currentPlayerId = frame.currentPlayerTurn;
       const isPlayerOne = currentPlayerId === playerOneId;
-      
-      // Get the break that's being ended to track highest break
-      const breakToSave = isPlayerOne ? frame.playerOneBreak : frame.playerTwoBreak;
 
       // Record an "end break" marker using foul type
       await recordShot({
@@ -108,11 +126,6 @@ export function useEndBreak() {
         points: 0,
         isFoul: false,
       });
-
-      // Update player's highest break if current break is higher
-      if (breakToSave > 0) {
-        await updatePlayerHighestBreak(currentPlayerId, breakToSave);
-      }
 
       // Switch to other player and reset breaks
       const nextPlayerId = isPlayerOne ? playerTwoId : playerOneId;
@@ -126,9 +139,6 @@ export function useEndBreak() {
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
         queryKey: [...QUERY_KEYS.ACTIVE_FRAME, variables.gameId],
-      });
-      queryClient.invalidateQueries({
-        queryKey: QUERY_KEYS.PLAYERS,
       });
     },
   });
@@ -161,9 +171,6 @@ export function useRecordFoul() {
       const isPlayerOne = currentPlayerId === playerOneId;
       const opponentId = isPlayerOne ? playerTwoId : playerOneId;
 
-      // Get the break that's being ended to track highest break
-      const breakToSave = isPlayerOne ? frame.playerOneBreak : frame.playerTwoBreak;
-
       // Record the foul shot
       await recordShot({
         frameId: frame.id,
@@ -173,11 +180,6 @@ export function useRecordFoul() {
         isFoul: true,
         foulPoints,
       });
-
-      // Update player's highest break if current break is higher
-      if (breakToSave > 0) {
-        await updatePlayerHighestBreak(currentPlayerId, breakToSave);
-      }
 
       // Calculate new opponent score (foul points go to opponent)
       const opponentCurrentScore = isPlayerOne
@@ -205,9 +207,6 @@ export function useRecordFoul() {
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
         queryKey: [...QUERY_KEYS.ACTIVE_FRAME, variables.gameId],
-      });
-      queryClient.invalidateQueries({
-        queryKey: QUERY_KEYS.PLAYERS,
       });
     },
   });

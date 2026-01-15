@@ -45,8 +45,8 @@ export const QUERY_KEYS = {
   SHOTS: ["shots"],
 } as const;
 
-
 export const FOUL_BALLS = [
+  { ball: "white", points: 4 },
   { ball: "red", points: 4 },
   { ball: "yellow", points: 4 },
   { ball: "green", points: 4 },

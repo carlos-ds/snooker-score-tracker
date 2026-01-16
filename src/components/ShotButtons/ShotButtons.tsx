@@ -208,7 +208,7 @@ function ShotButtons({
     }
   };
 
-  const handleFoul = async (foulPoints: number, isFreeBall: boolean) => {
+  const handleFoul = async (foulPoints: number, isFreeBall: boolean, isMiss: boolean) => {
     try {
       await recordFoulMutation.mutateAsync({
         frame,
@@ -217,6 +217,7 @@ function ShotButtons({
         playerOneId,
         playerTwoId,
         isFreeBall,
+        isMiss,
       });
       
       // If free ball is awarded, set free ball mode for the incoming player

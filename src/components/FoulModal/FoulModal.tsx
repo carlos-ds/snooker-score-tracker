@@ -5,12 +5,13 @@ import "./FoulModal.css";
 interface FoulModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSelectFoul: (foulPoints: number, isFreeBall: boolean) => void;
+  onSelectFoul: (foulPoints: number, isFreeBall: boolean, isMiss: boolean) => void;
 }
 
 function FoulModal({ isOpen, onClose, onSelectFoul }: FoulModalProps) {
   const [selectedBall, setSelectedBall] = useState<string | null>(null);
   const [isFreeBall, setIsFreeBall] = useState(false);
+  const [isMiss, setIsMiss] = useState(false);
 
   if (!isOpen) return null;
 
@@ -18,16 +19,18 @@ function FoulModal({ isOpen, onClose, onSelectFoul }: FoulModalProps) {
     if (!selectedBall) return;
     
     const foulPoints = FOUL_POINTS[selectedBall];
-    onSelectFoul(foulPoints, isFreeBall);
+    onSelectFoul(foulPoints, isFreeBall, isMiss);
     
     setSelectedBall(null);
     setIsFreeBall(false);
+    setIsMiss(false);
     onClose();
   };
 
   const handleClose = () => {
     setSelectedBall(null);
     setIsFreeBall(false);
+    setIsMiss(false);
     onClose();
   };
 
@@ -59,6 +62,17 @@ function FoulModal({ isOpen, onClose, onSelectFoul }: FoulModalProps) {
         </div>
 
         <div>
+          <label>
+            <input
+              type="checkbox"
+              checked={isMiss}
+              onChange={(e) => setIsMiss(e.target.checked)}
+            />
+            Miss
+          </label>
+        </div>
+
+        <div>
           <button onClick={handleClose}>
             Cancel
           </button>
@@ -72,3 +86,4 @@ function FoulModal({ isOpen, onClose, onSelectFoul }: FoulModalProps) {
 }
 
 export default FoulModal;
+

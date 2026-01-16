@@ -67,16 +67,18 @@ export function useRecordShot() {
         isFreeBall,
       });
 
-      // Update frame
+      // Update frame - also reset miss counter since a legal shot was made
       const updates = {
         ...(isPlayerOne
           ? {
               playerOneScore: newScore,
               playerOneBreak: newBreak,
+              playerOneMissCount: 0,
             }
           : {
               playerTwoScore: newScore,
               playerTwoBreak: newBreak,
+              playerTwoMissCount: 0,
             }),
         redsRemaining: newRedsRemaining,
       };
@@ -262,9 +264,12 @@ interface RecordFoulParams {
   playerOneId: number;
   playerTwoId: number;
   isFreeBall?: boolean;
+  isMiss?: boolean;
 }
 
 // Hook to record a foul and award points to the opponent.
+// Also handles the three-miss rule: if a player commits 3 consecutive misses,
+// they lose the frame.
 export function useRecordFoul() {
   const queryClient = useQueryClient();
 
@@ -274,6 +279,8 @@ export function useRecordFoul() {
       foulPoints,
       playerOneId,
       playerTwoId,
+      gameId,
+      isMiss,
     }: RecordFoulParams) => {
       if (!frame.id) {
         throw new Error("Frame ID is required");
@@ -283,7 +290,7 @@ export function useRecordFoul() {
       const isPlayerOne = currentPlayerId === playerOneId;
       const opponentId = isPlayerOne ? playerTwoId : playerOneId;
 
-      // Record the foul shot
+      // Record the foul shot with miss flag
       await recordShot({
         frameId: frame.id,
         playerId: currentPlayerId,
@@ -291,6 +298,7 @@ export function useRecordFoul() {
         points: 0,
         isFoul: true,
         foulPoints,
+        isMiss,
       });
 
       // Award foul points to opponent's score
@@ -298,16 +306,58 @@ export function useRecordFoul() {
         ? frame.playerTwoScore + foulPoints
         : frame.playerOneScore + foulPoints;
 
+      // Calculate new miss count
+      const currentMissCount = isPlayerOne
+        ? frame.playerOneMissCount
+        : frame.playerTwoMissCount;
+      
+      // If it's a miss, increment the counter; otherwise reset to 0
+      const newMissCount = isMiss ? currentMissCount + 1 : 0;
+
+      // Check for three-miss frame loss BEFORE updating the frame
+      if (newMissCount >= 3) {
+        // Three consecutive misses - opponent wins the frame
+        const winnerId = opponentId;
+        
+        // Complete the frame with opponent as winner
+        await completeFrame(frame.id, winnerId);
+
+        // Check for match win
+        const game = await getGameById(gameId);
+        if (game) {
+          const allFrames = await getFramesByGame(gameId);
+          
+          const p1Wins = allFrames.filter(f => f.winnerId === playerOneId).length;
+          const p2Wins = allFrames.filter(f => f.winnerId === game.playerTwoId).length;
+          const winsNeeded = Math.ceil(game.bestOfFrames / 2);
+
+          if (p1Wins >= winsNeeded || p2Wins >= winsNeeded) {
+            await completeActiveGame();
+          } else {
+            // Match not over - create next frame
+            const nextFrameNumber = allFrames.length + 1;
+            // Loser (the player who made 3 misses) breaks first
+            const nextStartingPlayer = currentPlayerId;
+            await createFrame({
+              gameId,
+              frameNumber: nextFrameNumber,
+              startingPlayerId: nextStartingPlayer,
+              redsCount: game.redsCount,
+            });
+          }
+        }
+        return; // Frame is over, no need to update scores
+      }
+
       // Update frame: switch turn, reset breaks, add points to opponent
-      // Note: Free ball mode is handled in the UI (ShotButtons component)
-      // to allow the incoming player to nominate any ball as the ball on
+      // Also update the miss counter for the current player
       const updates = {
         currentPlayerTurn: opponentId,
         playerOneBreak: 0,
         playerTwoBreak: 0,
         ...(isPlayerOne
-          ? { playerTwoScore: newOpponentScore }
-          : { playerOneScore: newOpponentScore }),
+          ? { playerTwoScore: newOpponentScore, playerOneMissCount: newMissCount }
+          : { playerOneScore: newOpponentScore, playerTwoMissCount: newMissCount }),
       };
 
       await updateFrameScore(frame.id, updates);
@@ -316,6 +366,9 @@ export function useRecordFoul() {
       queryClient.invalidateQueries({
         queryKey: [...QUERY_KEYS.ACTIVE_FRAME, variables.gameId],
       });
+      // Also invalidate Game queries in case status changed
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ACTIVE_GAME });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.GAME_FRAMES });
     },
   });
 }

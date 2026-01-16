@@ -24,4 +24,7 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  build: {
+    manifest: true, // Generate .vite/manifest.json for SW precache
+  },
 });

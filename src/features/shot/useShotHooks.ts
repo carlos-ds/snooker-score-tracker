@@ -85,12 +85,14 @@ export function useRecordShot() {
 
       // --- Check for Final Black Frame Completion ---
       // "A frame usually ends when the final black ball is potted, provided the scores are not tied."
-      if (ballType === "black" && frame.redsRemaining === 0) {
+      // A free ball black is NOT the final black - the actual black must be potted in strict order
+      if (ballType === "black" && frame.redsRemaining === 0 && !isFreeBall) {
         // Fetch shots to verify this is the Final Black (clearance phase) and not a Black-after-Red
         const shots = await getShotsByFrame(frame.id);
         
         // If it's the only shot (rare) or the previous shot was NOT a red, it's the Final Black.
         // (If previous shot was Red, this is a Color-After-Red, so frame continues).
+        // Also ensure the current shot is not a free ball (already checked above)
         const isFinalBlack = shots.length === 1 || (shots.length >= 2 && shots[shots.length - 2].ballType !== "red");
 
         if (isFinalBlack) {

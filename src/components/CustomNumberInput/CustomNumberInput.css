@@ -1,0 +1,61 @@
+.custom-number-input { 
+  grid-column: span 2;
+  height: 7rem;
+
+  border-radius: var(--brad-base);
+  box-shadow: var(--neu-raised);
+  background-color: var(--clr-surface-raised);
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  .custom-number-input__toggle {
+    width: 100%;
+    height: 100%;
+    
+    font-size: var(--fs-lg);
+
+    border: none;
+    background-color: transparent;
+  }
+
+  .custom-number-input__input-group { 
+    width: 100%;
+    height: 40%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    
+    .custom-number-input__input { 
+      width: 80%;
+      padding: .5rem .25rem;
+      
+      border-radius: var(--brad-base);
+      border: 2px solid var(--clr-surface);
+      box-shadow: var(--neu-raised);
+      background-color: var(--clr-surface);
+      
+      color: var(--clr-accent-primary);
+      text-align: center;
+      font-size: var(--fs-base);
+    }
+  }
+}
+
+.custom-number-input--selected,
+.custom-number-input--editing {
+  box-shadow: var(--neu-inset);
+  background-color: var(--clr-surface);
+
+  .custom-number-input__toggle {
+    height: fit-content;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+    color: var(--clr-accent-primary);
+  }
+}

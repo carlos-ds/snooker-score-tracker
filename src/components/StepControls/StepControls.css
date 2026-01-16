@@ -1,0 +1,22 @@
+.step-button { 
+  color: white;
+  padding: .75rem 2rem;
+
+  border: 2px solid var(--clr-accent-primary);
+  border-radius: var(--brad-base);
+  background: linear-gradient(to left, var(--clr-accent-primary) 0%, var(--clr-accent-shadow) 100%);
+
+  &.step-button--secondary { 
+    position: relative;
+    
+    color: var(--clr-accent-primary);
+    border: 2px solid var(--clr-accent-primary);
+    background: transparent;
+  }
+
+  &:disabled { 
+    color: var(--clr-surface-raised);
+    border: 2px solid var(--clr-surface-raised);
+    background: transparent;
+  }
+}

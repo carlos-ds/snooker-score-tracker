@@ -11,6 +11,8 @@ interface RecordShotParams {
   ballType: Exclude<BallType, "foul">;
   gameId: number;
   playerOneId: number;
+  isFreeBall?: boolean;
+  freeBallActualPoints?: number; // The points for the actual ball on (not the nominated ball)
 }
 
 // Hook to record a shot and update frame state.
@@ -23,6 +25,8 @@ export function useRecordShot() {
       ballType,
       playerOneId,
       gameId,
+      isFreeBall,
+      freeBallActualPoints,
     }: RecordShotParams) => {
       if (!frame.id) {
         throw new Error("Frame ID is required");
@@ -30,7 +34,12 @@ export function useRecordShot() {
 
       const currentPlayerId = frame.currentPlayerTurn;
       const isPlayerOne = currentPlayerId === playerOneId;
-      const points = BALL_POINTS[ballType];
+      
+      // For free ball shots, use the actual ball-on value (e.g., 1 for red)
+      // instead of the nominated ball's value
+      const points = isFreeBall && freeBallActualPoints !== undefined
+        ? freeBallActualPoints
+        : BALL_POINTS[ballType];
 
       // Calculate new scores
       const currentScore = isPlayerOne
@@ -42,8 +51,11 @@ export function useRecordShot() {
 
       const newScore = currentScore + points;
       const newBreak = currentBreak + points;
+      
+      // Free ball doesn't affect reds remaining (the nominated ball is respotted)
+      // Only decrement reds when an actual red is potted (not a free ball nomination)
       const newRedsRemaining =
-        ballType === "red" ? frame.redsRemaining - 1 : frame.redsRemaining;
+        ballType === "red" && !isFreeBall ? frame.redsRemaining - 1 : frame.redsRemaining;
 
       // Record shot
       await recordShot({
@@ -52,6 +64,7 @@ export function useRecordShot() {
         ballType,
         points,
         isFoul: false,
+        isFreeBall,
       });
 
       // Update frame
@@ -137,6 +150,7 @@ interface EndBreakParams {
   gameId: number;
   playerOneId: number;
   playerTwoId: number;
+  isFreeBall?: boolean;
 }
 
 // Hook to end the current player's break and switch turns.
@@ -144,7 +158,7 @@ export function useEndBreak() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ frame, playerOneId, playerTwoId }: EndBreakParams) => {
+    mutationFn: async ({ frame, playerOneId, playerTwoId, isFreeBall }: EndBreakParams) => {
       if (!frame.id) {
         throw new Error("Frame ID is required");
       }
@@ -153,12 +167,14 @@ export function useEndBreak() {
       const isPlayerOne = currentPlayerId === playerOneId;
 
       // Record an "end break" marker using foul type
+      // isFreeBall tracks if game was in free ball mode when break ended
       await recordShot({
         frameId: frame.id,
         playerId: currentPlayerId,
         ballType: "foul",
         points: 0,
         isFoul: false,
+        isFreeBall,
       });
 
       // Switch to other player and reset breaks
@@ -187,6 +203,7 @@ interface UndoShotParams {
 }
 
 // Hook to undo the last shot and recalculate frame state.
+// Returns the deleted shot so caller can handle free ball mode restoration
 export function useUndoShot() {
   const queryClient = useQueryClient();
 
@@ -207,6 +224,9 @@ export function useUndoShot() {
         throw new Error("No shots to undo");
       }
 
+      // Get the last shot before deleting
+      const deletedShot = shots[shots.length - 1];
+
       // Delete the last shot
       await deleteLastShot(frame.id);
 
@@ -221,6 +241,9 @@ export function useUndoShot() {
       );
 
       await updateFrameScore(frame.id, updates);
+
+      // Return the deleted shot for free ball mode handling
+      return deletedShot;
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
@@ -236,6 +259,7 @@ interface RecordFoulParams {
   gameId: number;
   playerOneId: number;
   playerTwoId: number;
+  isFreeBall?: boolean;
 }
 
 // Hook to record a foul and award points to the opponent.
@@ -273,6 +297,8 @@ export function useRecordFoul() {
         : frame.playerOneScore + foulPoints;
 
       // Update frame: switch turn, reset breaks, add points to opponent
+      // Note: Free ball mode is handled in the UI (ShotButtons component)
+      // to allow the incoming player to nominate any ball as the ball on
       const updates = {
         currentPlayerTurn: opponentId,
         playerOneBreak: 0,

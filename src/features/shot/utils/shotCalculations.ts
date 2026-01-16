@@ -30,8 +30,9 @@ export function recalculateFrameState(
       }
     } else if (shot.ballType !== "foul") {
       // Regular shot (non-foul)
-      // Decrement reds counter
-      if (shot.ballType === "red") {
+      // Decrement reds counter only for actual reds, not free ball nominations
+      // Free ball shots are re-spotted, so they don't affect the reds count
+      if (shot.ballType === "red" && !shot.isFreeBall) {
         redsRemaining--;
       }
 

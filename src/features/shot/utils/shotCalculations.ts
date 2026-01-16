@@ -17,6 +17,8 @@ export function recalculateFrameState(
   let playerTwoBreak: number = SNOOKER_RULES.INITIAL_BREAK;
   let redsRemaining = initialRedsCount;
   let currentPlayerTurn = initialTurn;
+  let playerOneMissCount = 0;
+  let playerTwoMissCount = 0;
 
   // Replay all shots to recalculate state
   for (const shot of shots) {
@@ -25,8 +27,20 @@ export function recalculateFrameState(
       // Foul points go to the opponent of the fouling player
       if (shot.playerId === playerOneId) {
         playerTwoScore += shot.foulPoints;
+        // Handle miss counter for player one
+        if (shot.isMiss) {
+          playerOneMissCount++;
+        } else {
+          playerOneMissCount = 0;
+        }
       } else {
         playerOneScore += shot.foulPoints;
+        // Handle miss counter for player two
+        if (shot.isMiss) {
+          playerTwoMissCount++;
+        } else {
+          playerTwoMissCount = 0;
+        }
       }
     } else if (shot.ballType !== "foul") {
       // Regular shot (non-foul)
@@ -36,13 +50,16 @@ export function recalculateFrameState(
         redsRemaining--;
       }
 
-      // Add to player's score
+      // Add to player's score and reset their miss counter
       if (shot.playerId === playerOneId) {
         playerOneScore += shot.points;
+        playerOneMissCount = 0;
       } else {
         playerTwoScore += shot.points;
+        playerTwoMissCount = 0;
       }
     }
+    // Note: "end break" shots (ballType === "foul" && !isFoul) don't reset miss counters
   }
 
   // Determine current turn from last shot
@@ -75,6 +92,8 @@ export function recalculateFrameState(
     playerTwoBreak,
     redsRemaining,
     currentPlayerTurn,
+    playerOneMissCount,
+    playerTwoMissCount,
   };
 }
 

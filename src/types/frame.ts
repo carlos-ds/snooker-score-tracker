@@ -12,6 +12,8 @@ export interface Frame {
   playerTwoMissCount: number;
   status: FrameStatus;
   winnerId?: number;
+  isRespottedBlack?: boolean;
+  respottedBlackFirstPlayerId?: number;
   createdAt: Date;
   completedAt?: Date;
 }
@@ -36,5 +38,7 @@ export type FrameScoreUpdate = Partial<
     | "currentPlayerTurn"
     | "playerOneMissCount"
     | "playerTwoMissCount"
+    | "isRespottedBlack"
+    | "respottedBlackFirstPlayerId"
   >
 >;

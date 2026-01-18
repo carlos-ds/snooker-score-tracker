@@ -16,6 +16,8 @@ export async function createFrame(input: CreateFrameInput): Promise<number> {
     playerOneBreak: SNOOKER_RULES.INITIAL_BREAK,
     playerTwoBreak: SNOOKER_RULES.INITIAL_BREAK,
     redsRemaining: input.redsCount,
+    playerOneMissCount: 0,
+    playerTwoMissCount: 0,
     status: FRAME_STATUS.ACTIVE,
     createdAt: new Date(),
   };

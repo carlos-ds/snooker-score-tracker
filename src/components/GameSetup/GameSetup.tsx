@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useCreatePlayer } from "@/features/player/usePlayerHooks";
 import { useActiveGame, useCreateGame } from "@/features/game/useGameHooks";
 import { useNavigate } from "@tanstack/react-router";
@@ -29,16 +29,12 @@ function GameSetup() {
   const createPlayerMutation = useCreatePlayer();
   const createGameMutation = useCreateGame();
 
-  if (activeGame) {
-    return (
-      <div>
-        <p>A game is currently active.</p>
-        <button onClick={() => navigate({ to: "/game" })}>
-          Go to Active Game
-        </button>
-      </div>
-    );
-  }
+  // Auto-redirect to game if one is active
+  useEffect(() => {
+    if (activeGame && activeGame.status === "active") {
+      navigate({ to: "/game" });
+    }
+  }, [activeGame, navigate]);
 
   const handleNext = () => {
     setError(null);

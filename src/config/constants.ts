@@ -44,3 +44,26 @@ export const QUERY_KEYS = {
   PLAYERS: ["players"],
   SHOTS: ["shots"],
 } as const;
+
+export const FOUL_POINTS: Record<string, number> = {
+  white: 4,
+  red: 4,
+  yellow: 4,
+  green: 4,
+  brown: 4,
+  blue: 5,
+  pink: 6,
+  black: 7,
+};
+
+export const BALL_DISPLAY = [
+  { name: "white", label: "White" },
+  { name: "red", label: "Red" },
+  { name: "yellow", label: "Yellow" },
+  { name: "green", label: "Green" },
+  { name: "brown", label: "Brown" },
+  { name: "blue", label: "Blue" },
+  { name: "pink", label: "Pink" },
+  { name: "black", label: "Black" },
+] as const;
+

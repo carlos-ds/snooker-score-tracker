@@ -17,23 +17,49 @@ export function recalculateFrameState(
   let playerTwoBreak: number = SNOOKER_RULES.INITIAL_BREAK;
   let redsRemaining = initialRedsCount;
   let currentPlayerTurn = initialTurn;
+  let playerOneMissCount = 0;
+  let playerTwoMissCount = 0;
 
   // Replay all shots to recalculate state
   for (const shot of shots) {
-    // Skip foul markers for scoring
-    if (shot.ballType !== "foul") {
-      // Decrement reds counter
-      if (shot.ballType === "red") {
+    // Handle foul shots - award foul points to opponent
+    if (shot.ballType === "foul" && shot.isFoul && shot.foulPoints) {
+      // Foul points go to the opponent of the fouling player
+      if (shot.playerId === playerOneId) {
+        playerTwoScore += shot.foulPoints;
+        // Handle miss counter for player one
+        if (shot.isMiss) {
+          playerOneMissCount++;
+        } else {
+          playerOneMissCount = 0;
+        }
+      } else {
+        playerOneScore += shot.foulPoints;
+        // Handle miss counter for player two
+        if (shot.isMiss) {
+          playerTwoMissCount++;
+        } else {
+          playerTwoMissCount = 0;
+        }
+      }
+    } else if (shot.ballType !== "foul") {
+      // Regular shot (non-foul)
+      // Decrement reds counter only for actual reds, not free ball nominations
+      // Free ball shots are re-spotted, so they don't affect the reds count
+      if (shot.ballType === "red" && !shot.isFreeBall) {
         redsRemaining--;
       }
 
-      // Add to player's score
+      // Add to player's score and reset their miss counter
       if (shot.playerId === playerOneId) {
         playerOneScore += shot.points;
+        playerOneMissCount = 0;
       } else {
         playerTwoScore += shot.points;
+        playerTwoMissCount = 0;
       }
     }
+    // Note: "end break" shots (ballType === "foul" && !isFoul) don't reset miss counters
   }
 
   // Determine current turn from last shot
@@ -66,6 +92,8 @@ export function recalculateFrameState(
     playerTwoBreak,
     redsRemaining,
     currentPlayerTurn,
+    playerOneMissCount,
+    playerTwoMissCount,
   };
 }
 

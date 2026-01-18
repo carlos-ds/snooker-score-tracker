@@ -8,6 +8,8 @@ export interface Shot {
   points: number;
   isFoul: boolean;
   foulPoints?: number;
+  isFreeBall?: boolean;
+  isMiss?: boolean;
   timestamp: Date;
 }
 
@@ -18,4 +20,7 @@ export interface RecordShotInput {
   points: number;
   isFoul?: boolean;
   foulPoints?: number;
+  isFreeBall?: boolean;
+  isMiss?: boolean;
 }
+

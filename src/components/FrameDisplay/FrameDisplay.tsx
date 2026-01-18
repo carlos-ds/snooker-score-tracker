@@ -9,6 +9,13 @@ interface FrameDisplayProps {
   redsCount: number;
 }
 
+function calculateRemainingPoints(redsRemaining: number): number {
+  const redsWithBlackPoints = redsRemaining * 8;  
+  const finalColorsPoints = 27;
+  
+  return redsWithBlackPoints + finalColorsPoints;
+}
+
 function FrameDisplay({
   frame,
   playerOne,
@@ -17,10 +24,23 @@ function FrameDisplay({
   redsCount,
 }: FrameDisplayProps) {
   const isPlayerOneTurn = frame.currentPlayerTurn === playerOne.id;
+  
+  const remainingPoints = calculateRemainingPoints(frame.redsRemaining);
+  const pointDifference = Math.abs(frame.playerOneScore - frame.playerTwoScore);
+  const leader = frame.playerOneScore > frame.playerTwoScore 
+    ? playerOne.name 
+    : frame.playerTwoScore > frame.playerOneScore 
+      ? playerTwo.name 
+      : null;
 
   return (
     <div>
       <h2>Frame {frame.frameNumber}</h2>
+
+      <div>
+        <p>Remaining: {remainingPoints}</p>
+        <p>{leader ? `${leader} leads by ${pointDifference}` : 'Tied'}</p>
+      </div>
 
       <div>
         <div>

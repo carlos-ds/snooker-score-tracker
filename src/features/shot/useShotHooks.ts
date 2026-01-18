@@ -85,6 +85,35 @@ export function useRecordShot() {
 
       await updateFrameScore(frame.id, updates);
 
+      // --- Check for Respotted Black Win ---
+      // If we're in respotted black phase, potting the black wins the frame immediately
+      if (frame.isRespottedBlack && ballType === "black") {
+        const winnerId = currentPlayerId;
+        await completeFrame(frame.id, winnerId);
+        
+        const game = await getGameById(gameId);
+        if (game) {
+          const allFrames = await getFramesByGame(gameId);
+          const p1Wins = allFrames.filter(f => f.winnerId === playerOneId).length;
+          const p2Wins = allFrames.filter(f => f.winnerId === game.playerTwoId).length;
+          const winsNeeded = Math.ceil(game.bestOfFrames / 2);
+
+          if (p1Wins >= winsNeeded || p2Wins >= winsNeeded) {
+            await completeActiveGame();
+          } else {
+            const nextFrameNumber = allFrames.length + 1;
+            const nextStartingPlayer = winnerId === playerOneId ? game.playerTwoId : playerOneId;
+            await createFrame({
+              gameId,
+              frameNumber: nextFrameNumber,
+              startingPlayerId: nextStartingPlayer,
+              redsCount: game.redsCount,
+            });
+          }
+        }
+        return;
+      }
+
       // --- Check for Final Black Frame Completion ---
       // "A frame usually ends when the final black ball is potted, provided the scores are not tied."
       // A free ball black is NOT the final black - the actual black must be potted in strict order
@@ -101,18 +130,14 @@ export function useRecordShot() {
           const finalP1Score = isPlayerOne ? newScore : frame.playerOneScore;
           const finalP2Score = isPlayerOne ? frame.playerTwoScore : newScore;
 
-          // Only end if scores are not tied
           if (finalP1Score !== finalP2Score) {
-            // Retrieve game info for player specifics
+            // Scores not tied - normal frame completion
             const game = await getGameById(gameId);
             if (game) {
                const winnerId = finalP1Score > finalP2Score ? playerOneId : game.playerTwoId;
                
-               // Complete the Frame
                await completeFrame(frame.id, winnerId);
 
-               // --- Check for Match Win ---
-               // Get updated list of frames to count wins
                const allFrames = await getFramesByGame(gameId);
                
                const p1Wins = allFrames.filter(f => f.winnerId === playerOneId).length;
@@ -122,9 +147,7 @@ export function useRecordShot() {
                if (p1Wins >= winsNeeded || p2Wins >= winsNeeded) {
                  await completeActiveGame();
                } else {
-                 // Match not over yet - create next frame
                  const nextFrameNumber = allFrames.length + 1;
-                 // Loser of previous frame breaks first (standard snooker rule)
                  const nextStartingPlayer = winnerId === playerOneId ? game.playerTwoId : playerOneId;
                  await createFrame({
                    gameId,
@@ -134,6 +157,13 @@ export function useRecordShot() {
                  });
                }
             }
+          } else {
+            // Scores are tied - enter respotted black phase
+            await updateFrameScore(frame.id, {
+              isRespottedBlack: true,
+              playerOneBreak: 0,
+              playerTwoBreak: 0,
+            });
           }
         }
       }
@@ -289,6 +319,57 @@ export function useRecordFoul() {
       const currentPlayerId = frame.currentPlayerTurn;
       const isPlayerOne = currentPlayerId === playerOneId;
       const opponentId = isPlayerOne ? playerTwoId : playerOneId;
+
+      // --- Respotted Black Foul: Instant Loss ---
+      // Any foul during respotted black phase means the current player loses
+      if (frame.isRespottedBlack) {
+        // Award 7 points (black ball foul value) to opponent
+        const respottedBlackFoulPoints = 7;
+        
+        await recordShot({
+          frameId: frame.id,
+          playerId: currentPlayerId,
+          ballType: "foul",
+          points: 0,
+          isFoul: true,
+          foulPoints: respottedBlackFoulPoints,
+        });
+
+        // Update opponent's score with the 7 foul points
+        const newOpponentScore = isPlayerOne
+          ? frame.playerTwoScore + respottedBlackFoulPoints
+          : frame.playerOneScore + respottedBlackFoulPoints;
+
+        await updateFrameScore(frame.id, isPlayerOne
+          ? { playerTwoScore: newOpponentScore }
+          : { playerOneScore: newOpponentScore });
+
+        // Opponent wins the frame
+        const winnerId = opponentId;
+        await completeFrame(frame.id, winnerId);
+
+        const game = await getGameById(gameId);
+        if (game) {
+          const allFrames = await getFramesByGame(gameId);
+          const p1Wins = allFrames.filter(f => f.winnerId === playerOneId).length;
+          const p2Wins = allFrames.filter(f => f.winnerId === game.playerTwoId).length;
+          const winsNeeded = Math.ceil(game.bestOfFrames / 2);
+
+          if (p1Wins >= winsNeeded || p2Wins >= winsNeeded) {
+            await completeActiveGame();
+          } else {
+            const nextFrameNumber = allFrames.length + 1;
+            const nextStartingPlayer = winnerId === playerOneId ? game.playerTwoId : playerOneId;
+            await createFrame({
+              gameId,
+              frameNumber: nextFrameNumber,
+              startingPlayerId: nextStartingPlayer,
+              redsCount: game.redsCount,
+            });
+          }
+        }
+        return;
+      }
 
       // Record the foul shot with miss flag
       await recordShot({

@@ -1,34 +1,39 @@
 import { useEffect, useState } from "react";
-import type { Frame } from "@/types";
+import type { Frame, Player } from "@/types";
 import {
   useRecordShot,
   useEndBreak,
   useUndoShot,
   useRecordFoul,
 } from "@/features/shot/useShotHooks";
+import { useUpdateFrameScore } from "@/features/frame/useFrameHooks";
 import { getShotsByFrame } from "@/features/shot/operations";
 import { BALL_COLORS_ORDER } from "@/config/constants";
 import FoulModal from "@/components/FoulModal/FoulModal";
+import CoinTossModal from "@/components/CoinTossModal";
 
 interface ShotButtonsProps {
   frame: Frame;
   gameId: number;
-  playerOneId: number;
-  playerTwoId: number;
+  playerOne: Player;
+  playerTwo: Player;
   initialRedsCount: number;
 }
 
 function ShotButtons({
   frame,
   gameId,
-  playerOneId,
-  playerTwoId,
+  playerOne,
+  playerTwo,
   initialRedsCount,
 }: ShotButtonsProps) {
+  const playerOneId = playerOne.id!;
+  const playerTwoId = playerTwo.id!;
   const recordShotMutation = useRecordShot();
   const endBreakMutation = useEndBreak();
   const undoMutation = useUndoShot();
   const recordFoulMutation = useRecordFoul();
+  const updateFrameScoreMutation = useUpdateFrameScore();
 
   const [hasShotsToUndo, setHasShotsToUndo] = useState(false);
   const [lastShotWasRed, setLastShotWasRed] = useState(false);
@@ -36,6 +41,29 @@ function ShotButtons({
   const [strictOrderIndex, setStrictOrderIndex] = useState(0);
   const [showFoulModal, setShowFoulModal] = useState(false);
   const [isFreeBallMode, setIsFreeBallMode] = useState(false);
+  const [showCoinToss, setShowCoinToss] = useState(false);
+
+  // Show coin toss when entering respotted black phase
+  useEffect(() => {
+    if (frame.isRespottedBlack && !frame.respottedBlackFirstPlayerId) {
+      setShowCoinToss(true);
+    } else {
+      setShowCoinToss(false);
+    }
+  }, [frame.isRespottedBlack, frame.respottedBlackFirstPlayerId]);
+
+  const handleCoinTossChoice = async (chosenPlayerId: number) => {
+    if (!frame.id) return;
+    await updateFrameScoreMutation.mutateAsync({
+      frameId: frame.id,
+      updates: {
+        respottedBlackFirstPlayerId: chosenPlayerId,
+        currentPlayerTurn: chosenPlayerId,
+      },
+      gameId,
+    });
+    setShowCoinToss(false);
+  };
 
   useEffect(() => {
     const updateShotState = async () => {
@@ -257,12 +285,15 @@ function ShotButtons({
     return isColorAllowedInStrictOrder(color);
   };
 
-  const yellowEnabled = computeColorEnabled("yellow");
-  const greenEnabled = computeColorEnabled("green");
-  const brownEnabled = computeColorEnabled("brown");
-  const blueEnabled = computeColorEnabled("blue");
-  const pinkEnabled = computeColorEnabled("pink");
-  const blackEnabled = computeColorEnabled("black");
+  // During respotted black, only black is enabled
+  const isRespottedBlackPhase = !!(frame.isRespottedBlack && frame.respottedBlackFirstPlayerId);
+
+  const yellowEnabled = isRespottedBlackPhase ? false : computeColorEnabled("yellow");
+  const greenEnabled = isRespottedBlackPhase ? false : computeColorEnabled("green");
+  const brownEnabled = isRespottedBlackPhase ? false : computeColorEnabled("brown");
+  const blueEnabled = isRespottedBlackPhase ? false : computeColorEnabled("blue");
+  const pinkEnabled = isRespottedBlackPhase ? false : computeColorEnabled("pink");
+  const blackEnabled = isRespottedBlackPhase ? !recordShotMutation.isPending : computeColorEnabled("black");
 
   // Helper to get the correct display points for free ball mode
   // Free ball always scores as the value of the ball "on", not the nominated ball
@@ -285,10 +316,16 @@ function ShotButtons({
 
   const freeBallPoints = isFreeBallMode ? getFreeBallDisplayPoints() : null;
 
+  // Disable red during respotted black phase
+  const redDisabled = isRespottedBlackPhase || !redEnabled;
+
+  // Waiting for coin toss - disable controls until first player is selected
+  const isWaitingForCoinToss = !!(frame.isRespottedBlack && !frame.respottedBlackFirstPlayerId);
+
   return (
     <div>
       <div>
-        <button onClick={() => handlePot("red")} disabled={!redEnabled}>
+        <button onClick={() => handlePot("red")} disabled={redDisabled}>
           Red ({isFreeBallMode ? freeBallPoints : frame.redsRemaining})
         </button>
       </div>
@@ -315,20 +352,20 @@ function ShotButtons({
       </div>
 
       <div>
-        <button onClick={handleEndBreak} disabled={endBreakMutation.isPending}>
+        <button onClick={handleEndBreak} disabled={endBreakMutation.isPending || isWaitingForCoinToss}>
           {endBreakMutation.isPending ? "Switching..." : "End Break"}
         </button>
 
         <button
           onClick={() => setShowFoulModal(true)}
-          disabled={recordFoulMutation.isPending}
+          disabled={recordFoulMutation.isPending || isWaitingForCoinToss}
         >
           {recordFoulMutation.isPending ? "Recording..." : "Foul"}
         </button>
 
         <button
           onClick={handleUndo}
-          disabled={undoMutation.isPending || !hasShotsToUndo}
+          disabled={undoMutation.isPending || !hasShotsToUndo || isWaitingForCoinToss || isRespottedBlackPhase}
         >
           {undoMutation.isPending ? "Undoing..." : "Undo"}
         </button>
@@ -338,6 +375,13 @@ function ShotButtons({
         isOpen={showFoulModal}
         onClose={() => setShowFoulModal(false)}
         onSelectFoul={handleFoul}
+      />
+
+      <CoinTossModal
+        isOpen={showCoinToss}
+        playerOne={playerOne}
+        playerTwo={playerTwo}
+        onChooseFirstPlayer={handleCoinTossChoice}
       />
     </div>
   );

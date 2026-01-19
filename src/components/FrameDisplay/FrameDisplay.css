@@ -1,0 +1,29 @@
+.frame-display { 
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  height: 60%;
+
+  .frame-display__stats { 
+    height: 80%;
+    width: 45%;
+    padding: .5rem;
+
+    border-radius: var(--brad-base);
+    box-shadow: var(--neu-inset);
+    background-color: var(--clr-surface-raised);
+
+    &.frame-display__stats--active {
+      box-shadow: var(--neu-deep);
+    }
+
+    .frame-display__stats--header { 
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      padding-bottom: .5rem;
+    }
+  }
+}

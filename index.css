@@ -293,10 +293,18 @@ body {
       font-size: var(--fs-xl);
       color: var(--clr-text-title);
     }
+
+    &.form__header--game { 
+      height: 20%;
+    }
   }
 
   .form__body { 
     height: 70%;
+
+    &.form__body--game { 
+      height: 80%;
+    }
 
     .selection-group--reds {
       height: 100%;

@@ -3,7 +3,7 @@
 
   position: fixed;
   right: 0;
-  top: 1.25rem;
+  top: 1rem;
 
   padding: .5rem .5rem;
   border-radius: var(--brad-lg) 0 0 var(--brad-lg);

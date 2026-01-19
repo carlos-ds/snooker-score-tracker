@@ -8,7 +8,6 @@ function Game() {
   const navigate = useNavigate();
   const { data: activeGame, isLoading } = useActiveGame();
 
-  // Redirect to setup if no active game
   useEffect(() => {
     if (!isLoading && !activeGame) {
       navigate({ to: "/" });

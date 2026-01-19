@@ -3,6 +3,8 @@ import type { Frame, Player } from "@/types";
 import ShotButtons from "@/components/ShotButtons";
 import { getShotsByFrame } from "@/features/shot/operations";
 
+import './FrameDisplay.css'
+
 interface FrameDisplayProps {
   frame: Frame;
   playerOne: Player;
@@ -105,19 +107,19 @@ function FrameDisplay({
       </div>
 
       <div>
-        <div>
+        <article className={`frame-display__stats ${isPlayerOneTurn ? 'frame-display__stats--active' : ''}`}>
           <h3>{playerOne.name}</h3>
           <p>{frame.playerOneScore}</p>
           <p>Break: {frame.playerOneBreak}</p>
-          {isPlayerOneTurn && <p>•</p>}
-        </div>
+        </article>
 
-        <div>
-          <h3>{playerTwo.name}</h3>
-          <p>{frame.playerTwoScore}</p>
+        <article className={`frame-display__stats ${!isPlayerOneTurn ? 'frame-display__stats--active' : ''}`}>
+          <div className="frame-display__stats--header">
+            <h3>{playerTwo.name}</h3>
+            <p>{frame.playerTwoScore}</p>
+          </div>
           <p>Break: {frame.playerTwoBreak}</p>
-          {!isPlayerOneTurn && <p>•</p>}
-        </div>
+        </article>
       </div>
 
       <ShotButtons

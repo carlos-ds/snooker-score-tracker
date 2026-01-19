@@ -12,6 +12,8 @@ import { BALL_COLORS_ORDER } from "@/config/constants";
 import FoulModal from "@/components/FoulModal/FoulModal";
 import CoinTossModal from "@/components/CoinTossModal";
 
+import './ShotButtons.css'
+
 interface ShotButtonsProps {
   frame: Frame;
   gameId: number;
@@ -316,58 +318,98 @@ function ShotButtons({
 
   const freeBallPoints = isFreeBallMode ? getFreeBallDisplayPoints() : null;
 
-  // Disable red during respotted black phase
-  const redDisabled = isRespottedBlackPhase || !redEnabled;
+  // // Disable red during respotted black phase
+  // const redDisabled = isRespottedBlackPhase || !redEnabled;
 
-  // Waiting for coin toss - disable controls until first player is selected
-  const isWaitingForCoinToss = !!(frame.isRespottedBlack && !frame.respottedBlackFirstPlayerId);
+  // // Waiting for coin toss - disable controls until first player is selected
+  // const isWaitingForCoinToss = !!(frame.isRespottedBlack && !frame.respottedBlackFirstPlayerId);
 
   return (
-    <div>
-      <div>
-        <button onClick={() => handlePot("red")} disabled={redDisabled}>
-          Red ({isFreeBallMode ? freeBallPoints : frame.redsRemaining})
-        </button>
+    <div className="shot-buttons">
+      <div className="shot-buttons__header">
+        <div className="shot-buttons__group">
+          <button className="shot-buttons__button shot-buttons__button--red" onClick={() => handlePot("red")} disabled={!redEnabled}>
+            {isFreeBallMode ? freeBallPoints : frame.redsRemaining}
+          </button>
+          <button
+            className="shot-buttons__button shot-buttons__button--icon"
+            onClick={handleUndo}
+            disabled={undoMutation.isPending || !hasShotsToUndo}
+          >
+            {undoMutation.isPending ? "..." : (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 156.199 156.199"
+                aria-hidden="true"
+                focusable="false"
+                className="shot-buttons__icon"
+              >
+                <g>
+                  <path
+                    fill="currentColor" d="M102.496,45.204h-2.499v-0.012l-77.613-0.368l32.958-32.959l-8.277-8.28L0,50.65l47.882,47.889 l8.28-8.28l-33.719-33.73l71.642,0.346v0.04h8.417c23.151,0,41.993,18.838,41.993,41.997c0,23.151-18.842,41.992-41.993,41.992H0 v11.711h102.496c29.613,0,53.703-24.09,53.703-53.703C156.199,69.293,132.109,45.204,102.496,45.204z"
+                  />
+                </g>
+              </svg>
+            )}
+          </button>
+        </div>
+        <div className="shot-buttons__group">
+          <button 
+            onClick={handleEndBreak} 
+            disabled={endBreakMutation.isPending}
+            className="shot-buttons__button shot-buttons__button--icon"
+          >
+            {endBreakMutation.isPending ? "..." : (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 156.199 156.199"
+                aria-hidden="true"
+                focusable="false"
+                className="shot-buttons__icon"
+              >
+                <g transform="translate(156.199 0) scale(-1 1)">
+                  <path
+                    fill="currentColor"
+                    d="M102.496,45.204h-2.499v-0.012l-77.613-0.368l32.958-32.959l-8.277-8.28L0,50.65l47.882,47.889
+                    l8.28-8.28l-33.719-33.73l71.642,0.346v0.04h8.417c23.151,0,41.993,18.838,41.993,41.997
+                    c0,23.151-18.842,41.992-41.993,41.992H0v11.711h102.496c29.613,0,53.703-24.09,53.703-53.703
+                    C156.199,69.293,132.109,45.204,102.496,45.204z"
+                  />
+                </g>
+              </svg>
+            )}
+          </button>
+          <button
+            className="shot-buttons__button shot-buttons__button--foul"
+            onClick={() => setShowFoulModal(true)}
+            disabled={recordFoulMutation.isPending}
+          >
+            {recordFoulMutation.isPending ? "..." : "!"}
+          </button>
+        </div>
       </div>
-
-      <div>
-        <button onClick={() => handlePot("yellow")} disabled={!yellowEnabled}>
-          Yellow ({isFreeBallMode ? freeBallPoints : 2})
+      <div className="shot-buttons__body">
+        <button className="shot-buttons__button shot-buttons__button--yellow" onClick={() => handlePot("yellow")} disabled={!yellowEnabled}>
+          {isFreeBallMode ? freeBallPoints : 2}
         </button>
-        <button onClick={() => handlePot("green")} disabled={!greenEnabled}>
-          Green ({isFreeBallMode ? freeBallPoints : 3})
+        <button className="shot-buttons__button shot-buttons__button--green" onClick={() => handlePot("green")} disabled={!greenEnabled}>
+          {isFreeBallMode ? freeBallPoints : 3}
         </button>
-        <button onClick={() => handlePot("brown")} disabled={!brownEnabled}>
-          Brown ({isFreeBallMode ? freeBallPoints : 4})
+        <button className="shot-buttons__button shot-buttons__button--brown" onClick={() => handlePot("brown")} disabled={!brownEnabled}>
+          {isFreeBallMode ? freeBallPoints : 4}
         </button>
-        <button onClick={() => handlePot("blue")} disabled={!blueEnabled}>
-          Blue ({isFreeBallMode ? freeBallPoints : 5})
+        <button className="shot-buttons__button shot-buttons__button--blue" onClick={() => handlePot("blue")} disabled={!blueEnabled}>
+          {isFreeBallMode ? freeBallPoints : 5}
         </button>
-        <button onClick={() => handlePot("pink")} disabled={!pinkEnabled}>
-          Pink ({isFreeBallMode ? freeBallPoints : 6})
+        <button className="shot-buttons__button shot-buttons__button--pink" onClick={() => handlePot("pink")} disabled={!pinkEnabled}>
+          {isFreeBallMode ? freeBallPoints : 6}
         </button>
-        <button onClick={() => handlePot("black")} disabled={!blackEnabled}>
-          Black ({isFreeBallMode ? freeBallPoints : 7})
-        </button>
-      </div>
-
-      <div>
-        <button onClick={handleEndBreak} disabled={endBreakMutation.isPending || isWaitingForCoinToss}>
-          {endBreakMutation.isPending ? "Switching..." : "End Break"}
-        </button>
-
-        <button
-          onClick={() => setShowFoulModal(true)}
-          disabled={recordFoulMutation.isPending || isWaitingForCoinToss}
-        >
-          {recordFoulMutation.isPending ? "Recording..." : "Foul"}
-        </button>
-
-        <button
-          onClick={handleUndo}
-          disabled={undoMutation.isPending || !hasShotsToUndo || isWaitingForCoinToss || isRespottedBlackPhase}
-        >
-          {undoMutation.isPending ? "Undoing..." : "Undo"}
+        <button className="shot-buttons__button shot-buttons__button--black" onClick={() => handlePot("black")} disabled={!blackEnabled}>
+          {isFreeBallMode ? freeBallPoints : 7}
         </button>
       </div>
 

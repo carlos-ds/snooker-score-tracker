@@ -2,6 +2,8 @@ import { useActiveGame } from "@/features/game/useGameHooks";
 import { useActiveFrame, useGameFrames } from "@/features/frame/useFrameHooks";
 import { usePlayers } from "@/features/player/usePlayerHooks";
 import FrameDisplay from "@/components/FrameDisplay";
+import MatchScoreHeader from "@/components/MatchScoreHeader";
+import MatchCompleteView from "@/components/MatchCompleteView";
 
 function FrameContainer() {
   const { data: activeGame } = useActiveGame();
@@ -21,35 +23,25 @@ function FrameContainer() {
   }
 
   // Calculate match score (frames won by each player)
-  const p1FrameWins = allFrames.filter((f) => f.winnerId === playerOne.id).length;
-  const p2FrameWins = allFrames.filter((f) => f.winnerId === playerTwo.id).length;
+  const playerOneFrameWins = allFrames.filter((f) => f.winnerId === playerOne.id).length;
+  const playerTwoFrameWins = allFrames.filter((f) => f.winnerId === playerTwo.id).length;
 
-  // Match Score Header (always visible during match)
-  const MatchScoreHeader = () => (
-    <div>
-      <div>Best of {activeGame.bestOfFrames}</div>
-      <div>
-        {playerOne.name} {p1FrameWins} - {p2FrameWins} {playerTwo.name}
-      </div>
-    </div>
-  );
+  const matchScoreProps = {
+    bestOfFrames: activeGame.bestOfFrames,
+    playerOne,
+    playerTwo,
+    playerOneFrameWins,
+    playerTwoFrameWins,
+  };
 
-  // Check if the entire match is completed
   if (activeGame.status === "completed") {
-    const matchWinner = p1FrameWins > p2FrameWins ? playerOne : playerTwo;
-    return (
-      <div>
-        <h1>Match Complete!</h1>
-        <MatchScoreHeader />
-        <p><strong>{matchWinner.name}</strong> wins the match!</p>
-      </div>
-    );
+    return <MatchCompleteView {...matchScoreProps} />;
   }
 
   if (frameLoading) {
     return (
       <div>
-        <MatchScoreHeader />
+        <MatchScoreHeader {...matchScoreProps} />
         <div>Loading frame...</div>
       </div>
     );
@@ -58,15 +50,20 @@ function FrameContainer() {
   // If there's an active frame, show it with the match score header
   if (activeFrame) {
     return (
-      <div>
-        <MatchScoreHeader />
-        <FrameDisplay
-          frame={activeFrame}
-          playerOne={playerOne}
-          playerTwo={playerTwo}
-          gameId={activeGame.id!}
-          redsCount={activeGame.redsCount ?? 15}
-        />
+      <div className="form">
+        <div className="form__header form__header--game">
+          <MatchScoreHeader {...matchScoreProps} currentFrameNumber={activeFrame.frameNumber} />
+        </div>
+
+        <div className="form__body form__body--game">
+          <FrameDisplay
+            frame={activeFrame}
+            playerOne={playerOne}
+            playerTwo={playerTwo}
+            gameId={activeGame.id!}
+            redsCount={activeGame.redsCount ?? 15}
+          />
+        </div>
       </div>
     );
   }

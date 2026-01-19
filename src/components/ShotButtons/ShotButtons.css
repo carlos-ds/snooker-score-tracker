@@ -1,0 +1,107 @@
+.shot-buttons { 
+  height: 40%;
+
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: center;
+  justify-content: center;
+
+  .shot-buttons__header { 
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    width: 100%;
+  }
+
+  .shot-buttons__body { 
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    
+    width: 100%;
+  }
+
+  .shot-buttons__group { 
+    width: 30%;
+
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .shot-buttons__button { 
+    width: 2.5rem;
+    height: 2.5rem;
+
+    border: none;
+    border-radius: var(--brad-round);
+    box-shadow: inset -12px -3px 5px rgba(0, 0, 0, 0.2);
+
+    &.shot-buttons__button--red { 
+      color: white;
+      background-color: var(--clr-accent-primary);
+    }
+
+    &.shot-buttons__button--foul { 
+      font-weight: bold;
+      font-size: var(--fs-lg);
+      color: var(--clr-accent-primary);
+      background-color: white;
+    }
+
+    &.shot-buttons__button--yellow { 
+      background-color: yellow;
+      color: black;
+    }
+
+    &.shot-buttons__button--green { 
+      background-color: green;
+      color: white;
+    }
+
+    &.shot-buttons__button--brown { 
+      background-color: brown;
+      color: white;
+    }
+
+    &.shot-buttons__button--blue { 
+      background-color: blue;
+      color: white;
+    }
+
+    &.shot-buttons__button--pink { 
+      background-color: pink;
+      color: black;
+    }
+
+    &.shot-buttons__button--black { 
+      background-color: black;
+      color: white;
+    }
+
+    &:disabled {
+      background-color: var(--clr-surface) !important;
+      color: var(--clr-text) !important;
+      box-shadow: var(--neu-inset) !important;
+      cursor: not-allowed;
+    }
+
+    &.shot-buttons__button--icon {
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      background-color: transparent !important;
+      box-shadow: none !important;
+
+      .shot-buttons__icon {
+        width: 1.5rem;
+        height: 1.5rem;
+
+        color: var(--clr-text);
+      }
+    }
+  }
+}

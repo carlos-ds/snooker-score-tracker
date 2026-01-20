@@ -1,0 +1,40 @@
+.overflow-menu {
+  
+  .overflow-menu__button {
+    position: fixed;
+    top: 1.75rem;
+    right: 1.75rem;
+
+    width: 2rem;
+    height: 2rem;
+
+    color: var(--clr-text-title);
+    font-size: var(--fs-lg);
+
+    border: none;
+    box-shadow: var(--neu-raised);
+    border-radius: var(--brad-round);
+    background-color: var(--clr-surface);
+  }
+
+  .overflow-menu__menu {
+    position: fixed;
+    top: 4.5rem;
+    right: 1.75rem;
+
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+
+    width: max-content;
+    max-width: 15rem;
+    padding: 1rem;
+
+    box-shadow: var(--neu-raised);
+    background-color: var(--clr-surface-raised);
+    border: none;
+    border-radius: var(--brad-base);
+
+    z-index: 1000;
+  }
+}

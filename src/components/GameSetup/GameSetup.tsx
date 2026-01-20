@@ -3,6 +3,12 @@ import { useCreatePlayer } from "@/features/player/usePlayerHooks";
 import { useActiveGame, useCreateGame } from "@/features/game/useGameHooks";
 import { useNavigate } from "@tanstack/react-router";
 import { SNOOKER_RULES } from "@/config/constants";
+import ProgressIndicator from "@/components/ProgressIndicator";
+import SelectionGroup from "@/components/SelectionGroup";
+import CustomNumberInput from "@/components/CustomNumberInput";
+import StepControls from "@/components/StepControls";
+import PlayerInput from "@/components/PlayerInput";
+import ErrorMessage from "@/components/ErrorMessage";
 
 type SetupStep = "reds" | "frames" | "players";
 
@@ -24,6 +30,9 @@ function GameSetup() {
   });
   const [showCustomFramesInput, setShowCustomFramesInput] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const steps = ["reds", "frames", "players"];
+  const getCurrentStepIndex = () => steps.indexOf(step) + 1;
 
   const { data: activeGame } = useActiveGame();
   const createPlayerMutation = useCreatePlayer();
@@ -105,134 +114,139 @@ function GameSetup() {
 
   return (
     <div>
-      {/* Progress Indicator */}
-      <div>
-        <div>1</div>
-        <div></div>
-        <div>2</div>
-        <div></div>
-        <div>3</div>
-      </div>
-
       <div>
         {step === "reds" && (
-          <div>
-            <h2>Initial Reds</h2>
-            <p>Select the number of red balls to start with.</p>
-            <div>
-              {[6, 10, 15].map((count) => (
-                <button
-                  key={count}
-                  onClick={() => setData({ ...data, redsCount: count })}
-                >
-                  <span>{count}</span>
-                  <span>Reds {data.redsCount === count ? "(Selected)" : ""}</span>
-                </button>
-              ))}
+          <div className="form">
+            <div className="form__header">
+              <ProgressIndicator steps={steps} current={getCurrentStepIndex()} />
+              <div className="">
+                <h2 className="form__title">Select your Reds</h2>
+                <p className="form__description">Select the number of red balls to start with.</p>
+              </div>
             </div>
-            <div>
-              <button onClick={handleNext}>Next</button>
+
+            <div className="form__body">
+              <SelectionGroup
+                className="selection-group--reds"
+                options={[
+                  { label: "6", value: 6, balls: 6 },
+                  { label: "10", value: 10, balls: 10 },
+                  { label: "15", value: 15, balls: 15 },
+                ]}
+                value={data.redsCount}
+                onChange={(value) => setData({ ...data, redsCount: value as number })}
+              />
+            </div>
+
+            <div className="form__footer">
+              <StepControls
+                nextDisabled
+                backVisible
+                onBack={handleBack}
+              />
+
+              <StepControls
+                nextVisible
+                onNext={handleNext}
+              />
             </div>
           </div>
         )}
 
         {step === "frames" && (
-          <div>
-            <h2>Match Length</h2>
-            <p>Best of how many frames?</p>
-            <div>
-              {[1, 3, 5].map((count) => (
-                <button
-                  key={count}
-                  onClick={() => setData({ ...data, bestOfFrames: count })}
-                >
-                  <span>{count}</span>
-                  <span>{count === 1 ? "Frame" : "Frames"} {data.bestOfFrames === count ? "(Selected)" : ""}</span>
-                </button>
-              ))}
-               <button
-                  onClick={() => setShowCustomFramesInput(!showCustomFramesInput)}
-                >
-                  <span>?</span>
-                  <span>Custom {showCustomFramesInput ? "(Editing)" : (![1, 3, 5].includes(data.bestOfFrames) ? "(Selected)" : "")}</span>
-                </button>
+          <div className="form">
+            <div className="form__header">
+              <ProgressIndicator steps={steps} current={getCurrentStepIndex()} />
+              <h2 className="form__title">Select your Frames</h2>
+              <p className="form__description">Select the number of frames to play.</p>
             </div>
-            
-            {showCustomFramesInput && (
-              <div>
-                <label>Enter number of frames:</label>
-                <input 
-                  type="number"
-                  min="1"
-                  step="2"
-                  value={data.bestOfFrames || ""}
-                  onChange={(e) => {
-                    const val = e.target.value;
-                    setData({ ...data, bestOfFrames: val === "" ? 0 : parseInt(val) });
-                  }}
-                />
-              </div>
-            )}
-            
-            {error && (
-              <div>
-                {error}
-              </div>
-            )}
 
-            <div>
-              <button onClick={handleBack}>Back</button>
-              <button onClick={handleNext}>Next</button>
+            <div className="form__body">
+              <SelectionGroup
+                className="selection-group--frames"
+                options={[
+                  { label: "1", value: 1, secondaryLabel: "Best of" },
+                  { label: "3", value: 3, secondaryLabel: "Best of" },
+                  { label: "5", value: 5, secondaryLabel: "Best of" },
+                  { label: "7", value: 7, secondaryLabel: "Best of" },
+                ]}
+                value={data.bestOfFrames}
+                onChange={(value) => setData({ ...data, bestOfFrames: value as number })}
+              >
+                <CustomNumberInput
+                  value={data.bestOfFrames}
+                  onChange={(value) => setData({ ...data, bestOfFrames: value })}
+                  min={1}
+                  step={2}
+                  editing={showCustomFramesInput}
+                  onToggle={() => setShowCustomFramesInput(!showCustomFramesInput)}
+                  standardValues={[1, 3, 5, 7]}
+                />
+              </SelectionGroup>
+            </div>
+
+            {error && <ErrorMessage message={error} />}
+
+            <div className="form__footer">
+              <StepControls
+                backVisible
+                onBack={handleBack}
+              />
+
+              <StepControls
+                nextVisible
+                onNext={handleNext}
+              />
             </div>
           </div>
         )}
 
         {step === "players" && (
-          <div>
-            <h2>Players</h2>
-            <p>Enter names for both players</p>
+          <div className="form">
+            <div className="form__header">
+              <ProgressIndicator steps={steps} current={getCurrentStepIndex()} />
+              <h2 className="form__title">Enter your Names</h2>
+              <p className="form__description">Enter names for both players</p>
+            </div>
             
-            <div style={{ marginBottom: '1rem' }}>
-              <label>Player 1 Name</label>
-              <input
-                type="text"
+            <div className="form__body form__body--players">
+              <PlayerInput
+                label="Player 1"
                 value={data.player1}
-                onChange={(e) => setData({ ...data, player1: e.target.value })}
+                onChange={(value) => setData({ ...data, player1: value })}
                 placeholder="Player 1"
                 autoFocus
               />
-            </div>
-
-            <div style={{ marginBottom: '1rem' }}>
-               <label>Player 2 Name</label>
-               <input
-                type="text"
+              <span className="form__label--vs">
+                VS
+              </span>
+              <PlayerInput
+                label="Player 2"
                 value={data.player2}
-                onChange={(e) => setData({ ...data, player2: e.target.value })}
+                onChange={(value) => setData({ ...data, player2: value })}
                 placeholder="Player 2"
-                onKeyDown={(e) => e.key === "Enter" && handleStartGame()}
+                onEnter={handleStartGame}
               />
             </div>
 
-            {error && (
-              <div style={{ color: 'red', marginBottom: '1rem' }}>
-                {error}
-              </div>
-            )}
+            {error && <ErrorMessage message={error} />}
 
-            <div>
-              <button onClick={handleBack}>Back</button>
-              <button 
-                onClick={handleStartGame} 
-                disabled={!data.player1.trim() || !data.player2.trim() || isLoading}
-              >
-                {isLoading ? "Starting..." : "Start Game"}
-              </button>
+            <div className="form__footer">
+              <StepControls
+                backVisible
+                onBack={handleBack}
+              />
+
+              <StepControls
+                startVisible
+                onStart={handleStartGame}
+                startDisabled={isLoading}
+                isLoading={isLoading}
+              />
             </div>
           </div>
         )}
       </div>
-
     </div>
   );
 }

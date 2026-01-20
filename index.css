@@ -1,0 +1,454 @@
+/*
+  Artevelde hogeschool CSS Reset v0.2
+  Adapted version from Josh's Custom CSS Reset https://www.joshwcomeau.com/css/custom-css-reset/
+*/
+
+/*
+  1. Use a more-intuitive box-sizing model.
+*/
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/*
+  2. Remove default margin
+*/
+* {
+  margin: 0;
+}
+
+/*
+  3. Allow percentage-based heights in the application
+*/
+html {
+  height: 100svh;
+  width: 100svw;
+  overflow: hidden;
+}
+
+/*
+  Typographic tweaks!
+  4. Add accessible line-height
+  5. Improve text rendering
+*/
+body {
+  height: 100svh;
+  width: 100svw;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+
+/*
+  6. Improve media defaults
+*/
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+/*
+  7. Remove built-in form typography styles
+*/
+input,
+button,
+textarea,
+select {
+  font: inherit;
+}
+
+/*
+  8. Avoid text overflows
+*/
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  overflow-wrap: break-word;
+}
+
+:root {
+  --ff-title: 'Sora', serif;
+  --ff-text: 'Plus Jakarta Sans', sans-serif;
+
+  --fs-xs: 0.75rem;
+  --fs-sm: 0.875rem;
+  --fs-base: .95rem;
+  --fs-lg: 1.25rem;
+  --fs-xl: 1.5rem;
+  --fs-xxl: 2rem;
+
+  --brad-sm: 6px;
+  --brad-base: 12px;
+  --brad-lg: 20px;
+  --brad-round: 50%;
+
+  --clr-base: #e8ebf0;
+  --clr-base-tint: #d4d9e0;
+  --clr-surface: #dce0e8;
+  --clr-surface-raised: #eceef3;
+
+  --clr-text-title: #1a1d23;
+  --clr-text-base: #4b5563;
+
+  --clr-accent-primary: #c62828;
+  --clr-accent-muted: #e57373;
+  --clr-accent-shadow: #9b1f1f;
+
+  --neu-flat: none;
+  /* soft, subtle shadow for small/soft UI elements */
+  --neu-soft:
+    -6px -6px 14px rgba(255, 255, 255, 0.85),
+    6px 6px 18px rgba(0, 0, 0, 0.08);
+  --neu-raised:
+    -10px -10px 20px rgba(255, 255, 255, 0.9),
+    10px 10px 24px rgba(0, 0, 0, 0.12);
+
+  --neu-deep:
+    -12px -12px 28px rgba(255, 255, 255, 0.95),
+    12px 12px 30px rgba(0, 0, 0, 0.16);
+
+  --neu-inset:
+    inset -8px -8px 12px rgba(255, 255, 255, 0.5),
+    inset 8px 8px 12px rgba(0, 0, 0, 0.12);
+}
+
+.theme--dark {
+  --clr-base: #14161b;
+  --clr-base-tint: #2a2e38;
+  --clr-surface: #1b1e25;
+  --clr-surface-raised: #222632;
+
+  --clr-text-title: #f1f3f7;
+  --clr-text-base: #b0b6c3;
+
+  --clr-accent-primary: #ef5350;
+  --clr-accent-muted: #ff867c;
+  --clr-accent-shadow: #b6181a;
+
+  --neu-flat: none;
+
+  --neu-soft:
+    -6px -6px 12px rgba(255, 255, 255, 0.04),
+    6px 6px 14px rgba(0, 0, 0, 0.5);
+  
+  --neu-raised:
+    -8px -8px 18px rgba(255, 255, 255, 0.06),
+    8px 8px 22px rgba(0, 0, 0, 0.48);
+
+  --neu-deep:
+    -10px -10px 22px rgba(255, 255, 255, 0.08),
+    10px 10px 26px rgba(0, 0, 0, 0.6);
+
+  --neu-inset:
+    inset -8px -8px 10px rgba(255, 255, 255, 0.02),
+    inset 8px 8px 12px rgba(0, 0, 0, 0.5);
+}
+
+body { 
+  height: 100svh;
+  width: 100svw;
+  
+  color: var(--clr-text-base);
+  font-size: var(--fs-base);
+  font-family: var(--ff-text);
+
+  z-index: -1;
+
+  position: relative;
+  overflow: hidden;
+
+  background-color: var(--clr-base);
+
+  &::after { 
+    content: "";
+    width: 25rem;
+    height: 25rem;
+
+    position: absolute;
+    top: -12.5rem;
+    right: -12.5rem;
+
+    filter: blur(2.5rem);
+    border-radius: var(--brad-round);
+
+    z-index: -1;
+
+    opacity: .75;
+
+    animation: movement-left 20s linear infinite;
+    background-color: var(--clr-base-tint);
+  }
+
+  &::before { 
+    content: "";
+    width: 20rem;
+    height: 20rem;
+
+    position: absolute;
+    bottom: -12.5rem;
+    left: -12.5rem;
+
+    filter: blur(2rem);
+    border-radius: var(--brad-round);
+
+    z-index: -1;
+
+    opacity: .25;
+
+    animation: movement-right 20s linear infinite;
+    background-color: var(--clr-base-tint);
+  }
+}
+
+#root {
+  height: 100svh;
+  width: 100svw;
+  overflow: hidden;
+}
+
+@keyframes movement-right {
+  0% { 
+    transform: translate(0, 0);
+  }
+  12.5% { 
+    transform: translate(25vw, -0.5rem);
+  }
+  25% { 
+    transform: translate(50vw, 0.25rem);
+  }
+  37.5% { 
+    transform: translate(75vw, -0.5rem);
+  }
+  50% { 
+    transform: translate(100vw, 0);
+  }
+  62.5% { 
+    transform: translate(75vw, 0.25rem);
+  }
+  75% { 
+    transform: translate(50vw, -0.5rem);
+  }
+  87.5% { 
+    transform: translate(25vw, 0.25rem);
+  }
+  100% { 
+    transform: translate(0, 0);
+  }
+}
+
+@keyframes movement-left {
+  0% { 
+    transform: translate(0, 0);
+  }
+  12.5% { 
+    transform: translate(-25vw, -0.5rem);
+  }
+  25% { 
+    transform: translate(-50vw, 0.25rem);
+  }
+  37.5% { 
+    transform: translate(-75vw, -0.5rem);
+  }
+  50% { 
+    transform: translate(-100vw, 0);
+  }
+  62.5% { 
+    transform: translate(-75vw, 0.25rem);
+  }
+  75% { 
+    transform: translate(-50vw, -0.5rem);
+  }
+  87.5% { 
+    transform: translate(-25vw, 0.25rem);
+  }
+  100% { 
+    transform: translate(0, 0);
+  }
+}
+
+.form { 
+  height: 100svh;
+  width: 100svw;
+
+  padding: 1.5rem;
+
+  .form__header {
+    position: relative;
+    height: 15%;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around ;
+
+    .form__title { 
+      font-family: var(--ff-title);
+      font-size: var(--fs-xl);
+      color: var(--clr-text-title);
+    }
+
+    &.form__header--game { 
+      height: 15%;
+
+      justify-content: start;
+    }
+  }
+
+  .form__body { 
+    height: 70%;
+
+
+    &.form__body--game { 
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+
+      height: 85%;
+    }
+
+    .selection-group--reds {
+      height: 100%;
+
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 8.5%;
+    
+      .option {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+
+        height: 25%;
+        width: 90%;
+        margin: 0 auto;
+
+        box-shadow: var(--neu-raised);
+        background-color: var(--clr-surface-raised);
+        border: none;
+        border-radius: var(--brad-base);
+        padding: 1.2rem 1rem;
+        text-align: center;
+
+        cursor: pointer;
+
+        .option__label { 
+          color: var(--clr-text-title);
+          font-size: var(--fs-lg);
+          font-weight: 600;
+
+          height: 3.5rem;
+          width: 3.5rem;
+
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          
+          border-radius: var(--brad-base);
+          box-shadow: var(--neu-inset);
+          background-color: var(--clr-surface);
+        }
+      }
+
+      .option--selected {
+        box-shadow: var(--neu-inset);
+        background-color: var(--clr-surface);
+
+        .option__label {
+          color: var(--clr-accent-primary);
+          box-shadow: var(--neu-flat);
+          background-color: var(--clr-surface);
+        }
+      }
+    }
+
+    .selection-group--frames {
+      height: 100%;
+
+      width: 90%;
+      margin: 0 auto;
+
+      display: grid;
+      grid-template-columns: repeat(2, 50%);
+      align-items: center;
+
+      .option { 
+        height: 7rem;
+        width: 7rem;
+
+        box-shadow: var(--neu-raised);
+        background-color: var(--clr-surface-raised);
+        border: none;
+        border-radius: var(--brad-base);
+    
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+
+        cursor: pointer;
+
+        .option__label { 
+          color: var(--clr-text-title);
+          font-size: var(--fs-lg);
+          font-weight: 600;
+        }
+
+        &:nth-child(even) { 
+          justify-self: end;
+        }
+      }
+
+      .option--selected {
+        box-shadow: var(--neu-inset);
+        background-color: var(--clr-surface);
+
+        .option__label, .option__secondary-label {
+          color: var(--clr-accent-primary);
+          box-shadow: var(--neu-flat);
+          background-color: var(--clr-surface);
+        }
+      }
+    } 
+    
+    &.form__body--players { 
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+
+      gap: 15%;
+      align-items: center;
+
+      width: 100%;
+
+      .form__label--vs { 
+        font-size: var(--fs-lg);
+        font-family: var(--ff-title);
+        font-weight: 600;
+        color: var(--clr-text-base);
+
+      }
+    }
+  }
+
+  .form__footer { 
+    height: 15%;
+    width: 100%;
+
+    margin: 0 auto;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+}
+

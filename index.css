@@ -167,6 +167,8 @@ body {
   position: relative;
   overflow: hidden;
 
+  background-color: var(--clr-base);
+
   &::after { 
     content: "";
     width: 25rem;
@@ -295,15 +297,22 @@ body {
     }
 
     &.form__header--game { 
-      height: 20%;
+      height: 15%;
+
+      justify-content: start;
     }
   }
 
   .form__body { 
     height: 70%;
 
+
     &.form__body--game { 
-      height: 80%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+
+      height: 85%;
     }
 
     .selection-group--reds {

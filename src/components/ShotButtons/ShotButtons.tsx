@@ -318,12 +318,6 @@ function ShotButtons({
 
   const freeBallPoints = isFreeBallMode ? getFreeBallDisplayPoints() : null;
 
-  // // Disable red during respotted black phase
-  // const redDisabled = isRespottedBlackPhase || !redEnabled;
-
-  // // Waiting for coin toss - disable controls until first player is selected
-  // const isWaitingForCoinToss = !!(frame.isRespottedBlack && !frame.respottedBlackFirstPlayerId);
-
   return (
     <div className="shot-buttons">
       <div className="shot-buttons__header">

@@ -4,6 +4,7 @@ import { usePlayers } from "@/features/player/usePlayerHooks";
 import FrameDisplay from "@/components/FrameDisplay";
 import MatchScoreHeader from "@/components/MatchScoreHeader";
 import MatchCompleteView from "@/components/MatchCompleteView";
+import GameControls from "@/components/GameControls";
 
 function FrameContainer() {
   const { data: activeGame } = useActiveGame();
@@ -53,6 +54,7 @@ function FrameContainer() {
       <div className="form">
         <div className="form__header form__header--game">
           <MatchScoreHeader {...matchScoreProps} currentFrameNumber={activeFrame.frameNumber} />
+          <GameControls />
         </div>
 
         <div className="form__body form__body--game">
@@ -62,6 +64,8 @@ function FrameContainer() {
             playerTwo={playerTwo}
             gameId={activeGame.id!}
             redsCount={activeGame.redsCount ?? 15}
+            playerOneFrameWins={playerOneFrameWins}
+            playerTwoFrameWins={playerTwoFrameWins}
           />
         </div>
       </div>

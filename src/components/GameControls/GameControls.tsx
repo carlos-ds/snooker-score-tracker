@@ -11,6 +11,8 @@ import { useResignFrame } from "@/features/shot/useShotHooks";
 import { useNavigate } from "@tanstack/react-router";
 import OverflowMenu from "@/components/OverflowMenu";
 
+import './GameControls.css'
+
 function GameControls() {
   const navigate = useNavigate();
   const { data: activeGame } = useActiveGame();
@@ -76,15 +78,15 @@ function GameControls() {
 
   return (
     <OverflowMenu>
-      <button onClick={handlePlayAgain} disabled={isStarting}>
+      <button className="game-controls__button" onClick={handlePlayAgain} disabled={isStarting}>
         {isStarting ? "Starting..." : "Play Again"}
       </button>
 
-      <button onClick={handleNewGame} disabled={isEnding}>
+      <button className="game-controls__button" onClick={handleNewGame} disabled={isEnding}>
         {isEnding ? "Ending..." : "New Game"}
       </button>
 
-      <button onClick={handleResign} disabled={resignFrameMutation.isPending || !activeFrame}>
+      <button className="game-controls__button" onClick={handleResign} disabled={resignFrameMutation.isPending || !activeFrame}>
         {resignFrameMutation.isPending ? "Resigning..." : "Resign Frame"}
       </button>
     </OverflowMenu>

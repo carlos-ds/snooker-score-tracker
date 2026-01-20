@@ -1,29 +1,94 @@
-.frame-display { 
+.stats { 
+  width: 90%;
+  margin: 1rem auto;
+
   display: flex;
   justify-content: space-between;
-  align-items: center;
 
-  height: 60%;
-
-  .frame-display__stats { 
-    height: 80%;
+  .stats__stat { 
     width: 45%;
-    padding: .5rem;
+    padding: 1rem;
 
-    border-radius: var(--brad-base);
-    box-shadow: var(--neu-inset);
+    border-radius: var(--brad-lg);
     background-color: var(--clr-surface-raised);
 
-    &.frame-display__stats--active {
-      box-shadow: var(--neu-deep);
-    }
+    scale: .95;
 
-    .frame-display__stats--header { 
+    .stats__header { 
       display: flex;
       align-items: center;
       justify-content: space-between;
 
-      padding-bottom: .5rem;
+      .stats__title { 
+        color: var(--clr-text-title);
+        font-family: var(--ff-title);
+        font-size: var(--fs-base);
+        font-weight: normal;
+      }
+
+      .stats__wins { 
+        color: var(--clr-text-title);
+        font-size: var(--fs-sm);
+
+        width: 1.5rem;
+        height: 1.5rem;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: var(--brad-sm);
+        box-shadow: var(--neu-inset);
+        background-color: var(--clr-surface);
+      }
     }
+
+    .stats__score { 
+      min-width: 2.5rem;
+      max-width: fit-content;
+      height: 2.5rem;
+
+      margin: 2rem auto;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      font-size: var(--fs-xl);
+
+      box-shadow: var(--neu-inset);
+      border-radius: var(--brad-base);
+      background-color: var(--clr-surface);
+    }
+
+    &.stats__stat--active { 
+      scale: 1;
+
+      box-shadow: var(--neu-raised);
+      background-color: var(--clr-surface-raised);
+
+      .stats__header {
+        .stats__title { 
+          color: var(--clr-accent-primary);
+        }
+      }
+
+      .stats__score {
+        color: var(--clr-accent-primary);
+      }
+
+      border: 1px solid var(--clr-accent-primary);
+    }
+  }
+}
+
+.frame-info { 
+  margin-top: 1.5rem;
+
+  text-align: center;
+
+  .frame-info__text { 
+    color: var(--clr-text-base);
+    font-size: var(--fs-base);
   }
 }

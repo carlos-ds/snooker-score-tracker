@@ -1,5 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 
+import './OverflowMenu.css'
+
 interface OverflowMenuProps {
   children: React.ReactNode;
 }
@@ -26,8 +28,9 @@ function OverflowMenu({ children }: OverflowMenuProps) {
   }, [isOpen]);
 
   return (
-    <div ref={menuRef}>
+    <div ref={menuRef} className="overflow-menu">
       <button
+        className="overflow-menu__button"
         onClick={() => setIsOpen(!isOpen)}
         aria-label="More options"
         aria-expanded={isOpen}
@@ -36,7 +39,7 @@ function OverflowMenu({ children }: OverflowMenuProps) {
       </button>
 
       {isOpen && (
-        <div role="menu">
+        <div role="menu" className="overflow-menu__menu">
           {children}
         </div>
       )}

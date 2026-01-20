@@ -14,26 +14,20 @@ interface MatchScoreHeaderProps {
 
 function MatchScoreHeader({
   bestOfFrames,
-  playerOneFrameWins,
-  playerTwoFrameWins,
   currentFrameNumber,
 }: MatchScoreHeaderProps) {
   return (
     <div className='match-score-header'>
-      <div className="match-score-header__labels">
-        <span className="match-score-header__label">
-          Best of {bestOfFrames}
-        </span>
-        <span className="match-score-header__label">
-          {playerOneFrameWins} - {playerTwoFrameWins}
-        </span>
-      </div>
+      <p className="match-score-header__label">
+        Best of {bestOfFrames}
+      </p>
       {currentFrameNumber !== undefined && (
-        <p className="match-score-header__text">
-          Frame {currentFrameNumber}
+        <p className="match-score-header__title">
+          Your current Frame <span className="match-score-header__title--accent"> {currentFrameNumber}</span>
         </p>
       )}
     </div>
+    
   );
 }
 

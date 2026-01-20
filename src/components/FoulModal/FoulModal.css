@@ -1,12 +1,134 @@
-.foul-modal-overlay {
+.foul-modal {
   position: fixed;
-  top: 50%;
-  transform: translateY(-50%);
-  
-  height: 75svh;
-  width: 75svw;
+  top: 35%;
+  left: 50%;
+  transform: translate(-50%, -35%);
 
-  
+  padding: 2rem 1rem;
+  width: 80%;
+  min-height: 50%;
+  height: fit-content;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  box-shadow: var(--neu-deep);
+  border-radius: var(--brad-lg);
   background-color: var(--clr-surface-raised);
 
+  .foul-modal__title {
+    text-align: center;
+
+    color: var(--clr-text-title);
+    font-family: var(--ff-title);
+    margin-bottom: .5rem;
+  }
+
+  .foul-modal__ball-buttons { 
+    display: flex;
+    flex-direction: column;
+    width: 75%;
+    margin: 0 auto;
+  }
+
+  .foul-modal__buttons-container { 
+    display: flex;
+    flex-wrap: wrap;
+    gap: .75rem;
+  }
+
+  .foul-modal__ball-button {
+    width: 2rem;
+    height: 2rem;
+    margin: 0 auto;
+
+    border: none;
+    border-radius: var(--brad-round);
+    box-shadow: var(--neu-raised), inset -4px -3px 5px rgba(0, 0, 0, 0.35);
+    background-color: var(--clr-surface-raised);
+
+    text-align: center;
+
+    cursor: pointer;
+
+    &.foul-modal__ball-button--selected { 
+      box-shadow: var(--neu-deep), inset -4px -3px 5px rgba(0, 0, 0, 0.35);
+      scale: 1.1;
+    }
+
+    &.foul-modal__ball-button--White {
+      background-color: white;
+      color: black;
+    }
+
+    &.foul-modal__ball-button--Red {
+      background-color: var(--clr-accent-primary);
+      color: black;
+    }
+
+    &.foul-modal__ball-button--Yellow {
+      background-color: yellow;
+      color: black;
+    }
+
+    &.foul-modal__ball-button--Green {
+      background-color: green;
+      color: white;
+    }
+
+    &.foul-modal__ball-button--Brown {
+      background-color: brown;
+      color: white;
+    }
+
+    &.foul-modal__ball-button--Blue {
+      background-color: blue;
+      color: white;
+    }
+
+    &.foul-modal__ball-button--Pink {
+      background-color: pink;
+      color: black;
+    }
+
+    &.foul-modal__ball-button--Black {
+      background-color: black;
+      color: white;
+    }
+  }
+
+  .foul-modal__options {
+    display: flex;
+    justify-content: space-around;
+
+    label {
+      font-size: var(--fs-md);
+      color: var(--clr-text-title);
+
+      input {
+        margin-right: .5rem;
+      }
+    }
+  }
+
+  .foul-modal__actions {
+    display: flex;
+    justify-content: space-between;
+
+    button {
+      width: 30%;
+      height: 2rem;
+
+      border: none;
+      border-radius: var(--brad-base);
+      box-shadow: var(--neu-raised);
+      background: linear-gradient(to left, var(--clr-accent-primary) 0%, var(--clr-accent-shadow) 100%);
+
+      font-size: var(--fs-md);
+      color: white;
+
+      cursor: pointer;
+    }
+  }
 }

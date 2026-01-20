@@ -2,7 +2,6 @@ import { useEffect } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { useActiveGame } from "@/features/game/useGameHooks";
 import FrameContainer from "@/components/FrameContainer";
-import GameControls from "@/components/GameControls";
 
 function Game() {
   const navigate = useNavigate();
@@ -26,9 +25,6 @@ function Game() {
     <>
       <main>
         <FrameContainer />
-        <div>
-          <GameControls />
-        </div>
       </main>
     </>
   )

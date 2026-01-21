@@ -1,0 +1,117 @@
+.coin-toss-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: 1000;
+  
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  animation: fade-in 0.3s ease-out forwards;
+}
+
+.coin-toss-modal {
+  padding: 2rem 1.5rem;
+  width: 90%;
+  max-width: 400px;
+  height: auto;
+  
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+
+  border-radius: var(--brad-lg);
+  background-color: var(--clr-surface-raised);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+
+  animation: pop-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.coin-toss-modal__title {
+  text-align: center;
+  color: var(--clr-text-title);
+  font-family: var(--ff-title);
+  font-size: var(--fs-lg);
+  margin: 0;
+}
+
+.coin-toss-modal__title--subtitle {
+  font-size: var(--fs-base);
+  font-weight: normal;
+  display: block;
+  margin-top: 0.25rem;
+  color: var(--clr-text-base);
+}
+
+.coin-toss-modal__winner {
+  font-size: var(--fs-xl);
+  font-weight: bold;
+  
+  width: 100%;
+  padding: 1.5rem 0;
+  
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  box-shadow: var(--neu-inset);
+  border-radius: var(--brad-base);
+  background-color: var(--clr-surface);
+  color: var(--clr-accent-primary);
+}
+
+.coin-toss-modal__choice {
+  width: 100%;
+  text-align: center;
+  font-size: var(--fs-md);
+}
+
+.coin-toss-modal__choice p {
+  color: var(--clr-text-base);
+  margin-bottom: 1rem;
+}
+
+.coin-toss-modal__buttons {
+  display: flex;
+  gap: 1rem;
+  width: 100%;
+}
+
+.coin-toss-modal__buttons button {
+  flex: 1;
+  height: 3rem;
+
+  border: none;
+  border-radius: var(--brad-base);
+  background-color: var(--clr-surface-raised);
+  box-shadow: var(--neu-raised);
+  color: var(--clr-text-title);
+  font-weight: 600;
+  font-size: var(--fs-base);
+  cursor: pointer;
+}
+
+.coin-toss-modal__buttons button:active {
+  box-shadow: var(--neu-inset);
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes pop-in {
+  from { 
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to { 
+    opacity: 1;
+    transform: scale(1);
+  }
+}

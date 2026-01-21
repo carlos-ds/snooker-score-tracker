@@ -1,0 +1,119 @@
+.shot-buttons { 
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  align-items: center;
+  justify-content: center;
+
+  width: 95%;
+  margin: 1rem auto 0 auto;
+
+  .shot-buttons__header { 
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    width: 100%;
+  }
+
+  .shot-buttons__body { 
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    justify-items: center;
+    gap: 1rem;
+    
+    width: 100%;
+  }
+
+  .shot-buttons__button { 
+    width: 3.5rem;
+    height: 3.5rem;
+
+    border: none;
+    border-radius: var(--brad-round);
+    box-shadow: inset -12px -3px 5px rgba(0, 0, 0, 0.2);
+
+    font-size: var(--fs-lg);
+    font-weight: 600;
+
+    &.shot-buttons__button--red { 
+      color: white;
+      background-color: var(--clr-accent-primary);
+    }
+
+    &.shot-buttons__button--foul { 
+      font-weight: bold;
+      font-size: var(--fs-xl);
+      color: var(--clr-accent-primary);
+      background-color: white;
+    }
+
+    &.shot-buttons__button--yellow { 
+      background-color: #fdd835;
+      color: black;
+    }
+
+    &.shot-buttons__button--green { 
+      background-color: #43a047;
+      color: white;
+    }
+
+    &.shot-buttons__button--brown { 
+      background-color: #795548;
+      color: white;
+    }
+
+    &.shot-buttons__button--blue { 
+      background-color: #1e88e5;
+      color: white;
+    }
+
+    &.shot-buttons__button--pink { 
+      background-color: #f06292;
+      color: black;
+    }
+
+    &.shot-buttons__button--black { 
+      background-color: #212121;
+      color: white;
+    }
+
+    &:disabled {
+      background-color: var(--clr-surface) !important;
+      color: var(--clr-text) !important;
+      box-shadow: var(--neu-inset) !important;
+      cursor: not-allowed;
+    }
+  }
+
+  .shot-buttons__action-btn { 
+    padding: 0.75rem 1.25rem;
+    border: none;
+    border-radius: var(--brad-base);
+    background-color: var(--clr-surface-raised);
+    box-shadow: var(--neu-raised);
+    color: var(--clr-text-title);
+    font-weight: 600;
+    font-size: var(--fs-base);
+    cursor: pointer;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    min-width: 5rem;
+    height: 3rem;
+
+    &:disabled {
+      background-color: var(--clr-surface);
+      color: var(--clr-text-base);
+      box-shadow: var(--neu-inset);
+      cursor: not-allowed;
+      opacity: 0.7;
+    }
+
+    &:active:not(:disabled) {
+      box-shadow: var(--neu-inset);
+    }
+  }
+}

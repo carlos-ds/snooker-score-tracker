@@ -1,0 +1,41 @@
+.player-input { 
+  width: 90%;
+  margin: 0 auto;
+  position: relative;
+
+  .player-input__label {
+    display: block;
+    position: absolute;
+    top: -2rem;
+
+    margin-left: .75rem;
+    margin-bottom: .25rem;
+    
+    font-size: var(--fs-base);
+    font-weight: 500;
+    color: var(--clr-text-base);
+  }
+
+  .player-input__input {
+    width: 100%;
+    padding: 1rem 1.2rem;
+    
+    border-radius: var(--brad-base);
+    border: none;
+    box-shadow: var(--neu-inset);
+    background-color: var(--clr-surface);
+    
+    color: var(--clr-text-title);
+    font-size: 16px;
+    /* font-size: var(--fs-base); */
+
+    &::placeholder { 
+      color: var(--clr-text-base);
+      opacity: 0.6;
+    }
+
+    &:focus { 
+      outline: 0;
+    }
+  }
+}

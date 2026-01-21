@@ -1,0 +1,17 @@
+.game-controls__button {
+  font-family: var(--ff-body);
+  font-size: var(--fs-md);
+  color: var(--clr-text-button);
+  background-color: var(--clr-accent);
+  border: none;
+  cursor: pointer;
+
+  &:hover:enabled {
+    background-color: var(--clr-accent-hover);
+  }
+
+  &:disabled {
+    background-color: var(--clr-accent-disabled);
+    cursor: not-allowed;
+  }
+}

@@ -6,15 +6,22 @@ import {
   useResetGameData,
   useCreateGame,
 } from "@/features/game/useGameHooks";
+import { useActiveFrame } from "@/features/frame/useFrameHooks";
+import { useResignFrame } from "@/features/shot/useShotHooks";
 import { useNavigate } from "@tanstack/react-router";
+import OverflowMenu from "@/components/OverflowMenu";
+
+import './GameControls.css'
 
 function GameControls() {
   const navigate = useNavigate();
   const { data: activeGame } = useActiveGame();
+  const { data: activeFrame } = useActiveFrame(activeGame?.id);
 
   const resetGameDataMutation = useResetGameData();
   const createGameMutation = useCreateGame();
   const deleteAllPlayersMutation = useDeleteAllPlayers();
+  const resignFrameMutation = useResignFrame();
 
   const handlePlayAgain = async () => {
     if (!activeGame) return;
@@ -45,7 +52,22 @@ function GameControls() {
     }
   };
 
-  if (!activeGame || activeGame.status !== "completed") {
+  const handleResign = async () => {
+    if (!activeGame || !activeFrame?.id) return;
+
+    try {
+      await resignFrameMutation.mutateAsync({
+        frame: activeFrame,
+        gameId: activeGame.id!,
+        playerOneId: activeGame.playerOneId,
+        playerTwoId: activeGame.playerTwoId,
+      });
+    } catch (error) {
+      console.error("Failed to resign frame:", error);
+    }
+  };
+
+  if (!activeGame) {
     return null;
   }
 
@@ -55,17 +77,20 @@ function GameControls() {
     resetGameDataMutation.isPending || deleteAllPlayersMutation.isPending;
 
   return (
-    <div>
-      <button onClick={handlePlayAgain} disabled={isStarting}>
+    <OverflowMenu>
+      <button className="game-controls__button" onClick={handlePlayAgain} disabled={isStarting}>
         {isStarting ? "Starting..." : "Play Again"}
       </button>
 
-      <button onClick={handleNewGame} disabled={isEnding}>
+      <button className="game-controls__button" onClick={handleNewGame} disabled={isEnding}>
         {isEnding ? "Ending..." : "New Game"}
       </button>
-    </div>
+
+      <button className="game-controls__button" onClick={handleResign} disabled={resignFrameMutation.isPending || !activeFrame}>
+        {resignFrameMutation.isPending ? "Resigning..." : "Resign Frame"}
+      </button>
+    </OverflowMenu>
   );
 }
 
 export default GameControls;
-

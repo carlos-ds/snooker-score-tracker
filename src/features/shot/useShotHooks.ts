@@ -295,6 +295,7 @@ interface RecordFoulParams {
   playerTwoId: number;
   isFreeBall?: boolean;
   isMiss?: boolean;
+  ballType?: BallType;
 }
 
 // Hook to record a foul and award points to the opponent.
@@ -311,6 +312,7 @@ export function useRecordFoul() {
       playerTwoId,
       gameId,
       isMiss,
+      ballType,
     }: RecordFoulParams) => {
       if (!frame.id) {
         throw new Error("Frame ID is required");
@@ -375,7 +377,7 @@ export function useRecordFoul() {
       await recordShot({
         frameId: frame.id,
         playerId: currentPlayerId,
-        ballType: "foul",
+        ballType: ballType || "foul",
         points: 0,
         isFoul: true,
         foulPoints,
@@ -454,3 +456,71 @@ export function useRecordFoul() {
   });
 }
 
+interface ResignFrameParams {
+  frame: Frame;
+  gameId: number;
+  playerOneId: number;
+  playerTwoId: number;
+}
+
+// Hook to resign the current frame. The current player loses the frame,
+// awarding the win to the opponent. Handles match win check and next frame creation.
+export function useResignFrame() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      frame,
+      playerOneId,
+      playerTwoId,
+      gameId,
+    }: ResignFrameParams) => {
+      if (!frame.id) {
+        throw new Error("Frame ID is required");
+      }
+
+      const currentPlayerId = frame.currentPlayerTurn;
+      const isPlayerOne = currentPlayerId === playerOneId;
+      
+      // The opponent wins when the current player resigns
+      const winnerId = isPlayerOne ? playerTwoId : playerOneId;
+
+      // Complete the frame with opponent as winner
+      await completeFrame(frame.id, winnerId);
+
+      // Check for match win
+      const game = await getGameById(gameId);
+      if (game) {
+        const allFrames = await getFramesByGame(gameId);
+        
+        const p1Wins = allFrames.filter(f => f.winnerId === playerOneId).length;
+        const p2Wins = allFrames.filter(f => f.winnerId === game.playerTwoId).length;
+        const winsNeeded = Math.ceil(game.bestOfFrames / 2);
+
+        if (p1Wins >= winsNeeded || p2Wins >= winsNeeded) {
+          // Match is won
+          await completeActiveGame();
+        } else {
+          // Match not over - create next frame
+          const nextFrameNumber = allFrames.length + 1;
+          // Winner of the frame breaks in the next frame (opponent of resigner)
+          const nextStartingPlayer = winnerId === playerOneId ? game.playerTwoId : playerOneId;
+          await createFrame({
+            gameId,
+            frameNumber: nextFrameNumber,
+            startingPlayerId: nextStartingPlayer,
+            redsCount: game.redsCount,
+          });
+        }
+      }
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: [...QUERY_KEYS.ACTIVE_FRAME, variables.gameId],
+      });
+      // Also invalidate Game queries in case status changed
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ACTIVE_GAME });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.GAME_FRAMES });
+    },
+  });
+}

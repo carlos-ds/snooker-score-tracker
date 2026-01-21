@@ -378,6 +378,10 @@ function ShotButtons({
         isOpen={showFoulModal}
         onClose={() => setShowFoulModal(false)}
         onSelectFoul={handleFoul}
+        redsRemaining={frame.redsRemaining}
+        isStrictOrderPhase={isStrictOrderPhase}
+        strictOrderIndex={strictOrderIndex}
+        isRespottedBlackPhase={isRespottedBlackPhase}
       />
 
       <CoinTossModal

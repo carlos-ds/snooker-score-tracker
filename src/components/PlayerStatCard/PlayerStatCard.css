@@ -1,0 +1,41 @@
+.statistics__player-card {
+    flex: 1;
+    padding: 1.5rem;
+
+    border-radius: var(--brad-base);
+    background-color: var(--clr-surface);
+    box-shadow: var(--neu-inset);
+    border: 1px solid var(--clr-base-tint);
+
+    .statistics__player-name {
+        font-family: var(--ff-title);
+        font-size: var(--fs-base);
+        font-weight: 600;
+        color: var(--clr-accent-primary);
+        margin-bottom: 0.75rem;
+        text-align: center;
+    }
+
+    .statistics__player-stats {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .statistics__player-stat {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        font-size: var(--fs-sm);
+
+        .statistics__player-stat-label {
+            color: var(--clr-text-base);
+        }
+
+        .statistics__player-stat-value {
+            font-weight: 600;
+            color: var(--clr-text-title);
+        }
+    }
+}

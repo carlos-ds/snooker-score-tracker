@@ -72,7 +72,13 @@ function ShotButtons({
       if (!frame.id) return;
 
       const shots = await getShotsByFrame(frame.id);
-      setHasShotsToUndo(shots.length > 0);
+      
+      // During respotted black phase, only allow undoing shots made during this phase
+      if (frame.isRespottedBlack && frame.respottedBlackShotCount !== undefined) {
+        setHasShotsToUndo(shots.length > frame.respottedBlackShotCount);
+      } else {
+        setHasShotsToUndo(shots.length > 0);
+      }
 
       const lastShot = shots[shots.length - 1];
 
@@ -238,7 +244,7 @@ function ShotButtons({
     }
   };
 
-  const handleFoul = async (foulPoints: number, isFreeBall: boolean, isMiss: boolean) => {
+  const handleFoul = async (foulPoints: number, isFreeBall: boolean, isMiss: boolean, foulBallName?: string) => {
     try {
       await recordFoulMutation.mutateAsync({
         frame,
@@ -248,6 +254,7 @@ function ShotButtons({
         playerTwoId,
         isFreeBall,
         isMiss,
+        ballType: foulBallName as any,
       });
       
       // If free ball is awarded, set free ball mode for the incoming player
@@ -321,72 +328,25 @@ function ShotButtons({
   return (
     <div className="shot-buttons">
       <div className="shot-buttons__header">
-        <div className="shot-buttons__group">
-          <button className="shot-buttons__button shot-buttons__button--red" onClick={() => handlePot("red")} disabled={!redEnabled}>
-            {isFreeBallMode ? freeBallPoints : frame.redsRemaining}
-          </button>
-          <button
-            className="shot-buttons__button shot-buttons__button--icon"
-            onClick={handleUndo}
-            disabled={undoMutation.isPending || !hasShotsToUndo}
-          >
-            {undoMutation.isPending ? "..." : (
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="20"
-                height="20"
-                viewBox="0 0 156.199 156.199"
-                aria-hidden="true"
-                focusable="false"
-                className="shot-buttons__icon"
-              >
-                <g>
-                  <path
-                    fill="currentColor" d="M102.496,45.204h-2.499v-0.012l-77.613-0.368l32.958-32.959l-8.277-8.28L0,50.65l47.882,47.889 l8.28-8.28l-33.719-33.73l71.642,0.346v0.04h8.417c23.151,0,41.993,18.838,41.993,41.997c0,23.151-18.842,41.992-41.993,41.992H0 v11.711h102.496c29.613,0,53.703-24.09,53.703-53.703C156.199,69.293,132.109,45.204,102.496,45.204z"
-                  />
-                </g>
-              </svg>
-            )}
-          </button>
-        </div>
-        <div className="shot-buttons__group">
-          <button 
-            onClick={handleEndBreak} 
-            disabled={endBreakMutation.isPending}
-            className="shot-buttons__button shot-buttons__button--icon"
-          >
-            {endBreakMutation.isPending ? "..." : (
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="20"
-                height="20"
-                viewBox="0 0 156.199 156.199"
-                aria-hidden="true"
-                focusable="false"
-                className="shot-buttons__icon"
-              >
-                <g transform="translate(156.199 0) scale(-1 1)">
-                  <path
-                    fill="currentColor"
-                    d="M102.496,45.204h-2.499v-0.012l-77.613-0.368l32.958-32.959l-8.277-8.28L0,50.65l47.882,47.889
-                    l8.28-8.28l-33.719-33.73l71.642,0.346v0.04h8.417c23.151,0,41.993,18.838,41.993,41.997
-                    c0,23.151-18.842,41.992-41.993,41.992H0v11.711h102.496c29.613,0,53.703-24.09,53.703-53.703
-                    C156.199,69.293,132.109,45.204,102.496,45.204z"
-                  />
-                </g>
-              </svg>
-            )}
-          </button>
-          <button
-            className="shot-buttons__button shot-buttons__button--foul"
-            onClick={() => setShowFoulModal(true)}
-            disabled={recordFoulMutation.isPending}
-          >
-            {recordFoulMutation.isPending ? "..." : "!"}
-          </button>
-        </div>
+        <button
+          className="shot-buttons__action-btn"
+          onClick={handleUndo}
+          disabled={undoMutation.isPending || !hasShotsToUndo}
+        >
+          {undoMutation.isPending ? "..." : "Undo"}
+        </button>
+        <button 
+          onClick={handleEndBreak} 
+          disabled={endBreakMutation.isPending}
+          className="shot-buttons__action-btn"
+        >
+          {endBreakMutation.isPending ? "..." : "End Break"}
+        </button>
       </div>
       <div className="shot-buttons__body">
+        <button className="shot-buttons__button shot-buttons__button--red" onClick={() => handlePot("red")} disabled={!redEnabled}>
+          {isFreeBallMode ? freeBallPoints : frame.redsRemaining}
+        </button>
         <button className="shot-buttons__button shot-buttons__button--yellow" onClick={() => handlePot("yellow")} disabled={!yellowEnabled}>
           {isFreeBallMode ? freeBallPoints : 2}
         </button>
@@ -404,6 +364,13 @@ function ShotButtons({
         </button>
         <button className="shot-buttons__button shot-buttons__button--black" onClick={() => handlePot("black")} disabled={!blackEnabled}>
           {isFreeBallMode ? freeBallPoints : 7}
+        </button>
+        <button
+          className="shot-buttons__button shot-buttons__button--foul"
+          onClick={() => setShowFoulModal(true)}
+          disabled={recordFoulMutation.isPending}
+        >
+          {recordFoulMutation.isPending ? "..." : "!"}
         </button>
       </div>
 

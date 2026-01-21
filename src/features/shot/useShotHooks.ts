@@ -159,8 +159,10 @@ export function useRecordShot() {
             }
           } else {
             // Scores are tied - enter respotted black phase
+            // Store shot count to prevent undoing shots from before this phase
             await updateFrameScore(frame.id, {
               isRespottedBlack: true,
+              respottedBlackShotCount: shots.length,
               playerOneBreak: 0,
               playerTwoBreak: 0,
             });
@@ -258,6 +260,15 @@ export function useUndoShot() {
         throw new Error("No shots to undo");
       }
 
+      // During respotted black phase, don't allow undoing shots from before this phase
+      if (
+        frame.isRespottedBlack &&
+        frame.respottedBlackShotCount !== undefined &&
+        shots.length <= frame.respottedBlackShotCount
+      ) {
+        throw new Error("Cannot undo shots from before respotted black phase");
+      }
+
       // Get the last shot before deleting
       const deletedShot = shots[shots.length - 1];
 
@@ -295,6 +306,7 @@ interface RecordFoulParams {
   playerTwoId: number;
   isFreeBall?: boolean;
   isMiss?: boolean;
+  ballType?: BallType;
 }
 
 // Hook to record a foul and award points to the opponent.
@@ -311,6 +323,7 @@ export function useRecordFoul() {
       playerTwoId,
       gameId,
       isMiss,
+      ballType,
     }: RecordFoulParams) => {
       if (!frame.id) {
         throw new Error("Frame ID is required");
@@ -375,7 +388,7 @@ export function useRecordFoul() {
       await recordShot({
         frameId: frame.id,
         playerId: currentPlayerId,
-        ballType: "foul",
+        ballType: ballType || "foul",
         points: 0,
         isFoul: true,
         foulPoints,

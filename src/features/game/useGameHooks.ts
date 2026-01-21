@@ -2,6 +2,7 @@ import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { QUERY_KEYS } from "@/config/constants";
 import {
   getActiveGame,
+  getLatestGame,
   createGame,
   completeActiveGame,
   deleteAllGames,
@@ -20,6 +21,18 @@ export function useActiveGame() {
     queryKey: QUERY_KEYS.ACTIVE_GAME,
     queryFn: async () => {
       const game = await getActiveGame();
+      return game ?? null;
+    },
+  });
+}
+
+// Hook to fetch the latest game (active preferred, otherwise most recent completed)
+// Returns null if no games exist
+export function useLatestGame() {
+  return useQuery({
+    queryKey: [...QUERY_KEYS.GAMES, "latest"],
+    queryFn: async () => {
+      const game = await getLatestGame();
       return game ?? null;
     },
   });

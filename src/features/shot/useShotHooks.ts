@@ -159,8 +159,10 @@ export function useRecordShot() {
             }
           } else {
             // Scores are tied - enter respotted black phase
+            // Store shot count to prevent undoing shots from before this phase
             await updateFrameScore(frame.id, {
               isRespottedBlack: true,
+              respottedBlackShotCount: shots.length,
               playerOneBreak: 0,
               playerTwoBreak: 0,
             });
@@ -256,6 +258,15 @@ export function useUndoShot() {
       const shots = await getShotsByFrame(frame.id);
       if (shots.length === 0) {
         throw new Error("No shots to undo");
+      }
+
+      // During respotted black phase, don't allow undoing shots from before this phase
+      if (
+        frame.isRespottedBlack &&
+        frame.respottedBlackShotCount !== undefined &&
+        shots.length <= frame.respottedBlackShotCount
+      ) {
+        throw new Error("Cannot undo shots from before respotted black phase");
       }
 
       // Get the last shot before deleting

@@ -195,7 +195,7 @@ function FrameDisplay({
 
         <div className="frame-info">
           <p className="frame-info__text">
-            Remaining points: {remainingPoints}
+            Points on table: {remainingPoints}
           </p>
 
           {leader ? (

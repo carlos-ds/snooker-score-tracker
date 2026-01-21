@@ -77,7 +77,7 @@ function GameSetup() {
   };
 
   const handleStartGame = async () => {
-    console.log("[GameSetup] handleStartGame called");
+    console.log("[GameSetup] handleStartGame called!");
     const trimmedPlayer1 = data.player1.trim();
     const trimmedPlayer2 = data.player2.trim();
 

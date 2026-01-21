@@ -1,134 +1,214 @@
-.foul-modal {
+.foul-modal-overlay {
   position: fixed;
-  top: 35%;
-  left: 50%;
-  transform: translate(-50%, -35%);
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: 1000;
+  animation: fade-in 0.2s ease-out forwards;
+}
 
-  padding: 2rem 1rem;
-  width: 80%;
-  min-height: 50%;
-  height: fit-content;
-
+.foul-modal {
+  position: absolute;
+  top: auto;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  transform: translateY(100%);
+  
+  padding: 2rem 1rem 3rem 1rem;
+  width: 100%;
+  max-width: none;
+  height: 50vh;
+  overflow-y: auto;
+  
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  gap: 1.5rem;
 
-  box-shadow: var(--neu-deep);
-  border-radius: var(--brad-lg);
+  border-top-left-radius: var(--brad-lg);
+  border-top-right-radius: var(--brad-lg);
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
   background-color: var(--clr-surface-raised);
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
 
-  .foul-modal__title {
-    text-align: center;
+  animation: slide-up 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
 
-    color: var(--clr-text-title);
-    font-family: var(--ff-title);
-    margin-bottom: .5rem;
-  }
+.foul-modal__title {
+  text-align: center;
+  color: var(--clr-text-title);
+  font-family: var(--ff-title);
+  font-size: var(--fs-lg);
+  margin: 0;
+}
 
-  .foul-modal__ball-buttons { 
-    display: flex;
-    flex-direction: column;
-    width: 75%;
-    margin: 0 auto;
-  }
+.foul-modal__ball-buttons { 
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin: 0 auto;
+  gap: 1rem;
+}
 
-  .foul-modal__buttons-container { 
-    display: flex;
-    flex-wrap: wrap;
-    gap: .75rem;
-  }
+.foul-modal__buttons-container { 
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  justify-items: center;
+  gap: 1rem;
+  width: 100%;
+}
 
-  .foul-modal__ball-button {
-    width: 2rem;
-    height: 2rem;
-    margin: 0 auto;
+.foul-modal__ball-button {
+  width: 3.5rem;
+  height: 3.5rem;
+  margin: 0;
 
-    border: none;
-    border-radius: var(--brad-round);
-    box-shadow: var(--neu-raised), inset -4px -3px 5px rgba(0, 0, 0, 0.35);
-    background-color: var(--clr-surface-raised);
+  border: none;
+  border-radius: var(--brad-round);
+  box-shadow: inset -12px -3px 5px rgba(0, 0, 0, 0.2);
+  
+  font-size: var(--fs-lg);
+  font-weight: 600;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+  cursor: pointer;
+}
 
-    text-align: center;
+.foul-modal__ball-button--selected { 
+  transform: scale(1.15);
+  z-index: 10;
+}
 
-    cursor: pointer;
+.foul-modal__ball-button--White {
+  background-color: #f5f5f5;
+  color: black;
+}
 
-    &.foul-modal__ball-button--selected { 
-      box-shadow: var(--neu-deep), inset -4px -3px 5px rgba(0, 0, 0, 0.35);
-      scale: 1.1;
-    }
+.foul-modal__ball-button--Red {
+  background-color: var(--clr-accent-primary);
+  color: white;
+}
 
-    &.foul-modal__ball-button--White {
-      background-color: white;
-      color: black;
-    }
+.foul-modal__ball-button--Yellow {
+  background-color: #fdd835;
+  color: black;
+}
 
-    &.foul-modal__ball-button--Red {
-      background-color: var(--clr-accent-primary);
-      color: black;
-    }
+.foul-modal__ball-button--Green {
+  background-color: #43a047;
+  color: white;
+}
 
-    &.foul-modal__ball-button--Yellow {
-      background-color: yellow;
-      color: black;
-    }
+.foul-modal__ball-button--Brown {
+  background-color: #795548;
+  color: white;
+}
 
-    &.foul-modal__ball-button--Green {
-      background-color: green;
-      color: white;
-    }
+.foul-modal__ball-button--Blue {
+  background-color: #1e88e5;
+  color: white;
+}
 
-    &.foul-modal__ball-button--Brown {
-      background-color: brown;
-      color: white;
-    }
+.foul-modal__ball-button--Pink {
+  background-color: #f06292;
+  color: black;
+}
 
-    &.foul-modal__ball-button--Blue {
-      background-color: blue;
-      color: white;
-    }
+.foul-modal__ball-button--Black {
+  background-color: #212121;
+  color: white;
+}
 
-    &.foul-modal__ball-button--Pink {
-      background-color: pink;
-      color: black;
-    }
+.foul-modal__buttons-container:has(.foul-modal__ball-button--selected) .foul-modal__ball-button:not(.foul-modal__ball-button--selected) {
+  opacity: 0.6;
+  transform: scale(0.9);
+}
 
-    &.foul-modal__ball-button--Black {
-      background-color: black;
-      color: white;
-    }
-  }
+.foul-modal__options {
+  display: flex;
+  justify-content: space-around;
+  padding: 0.5rem 0;
+}
 
-  .foul-modal__options {
-    display: flex;
-    justify-content: space-around;
+.foul-modal__options label {
+  font-size: var(--fs-base);
+  color: var(--clr-text-title);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
 
-    label {
-      font-size: var(--fs-md);
-      color: var(--clr-text-title);
+.foul-modal__options input {
+  width: 1.5rem;
+  height: 1.5rem;
+  accent-color: var(--clr-accent-primary);
+  cursor: pointer;
+}
 
-      input {
-        margin-right: .5rem;
-      }
-    }
-  }
+.foul-modal__actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
 
-  .foul-modal__actions {
-    display: flex;
-    justify-content: space-between;
+.foul-modal__actions button {
+  flex: 1;
+  height: 3rem;
+  
+  border: none;
+  border-radius: var(--brad-base);
+  background-color: var(--clr-surface-raised);
+  box-shadow: var(--neu-raised);
+  color: var(--clr-text-title);
+  font-weight: 600;
+  font-size: var(--fs-base);
+  cursor: pointer;
+}
 
-    button {
-      width: 30%;
-      height: 2rem;
+.foul-modal__actions button:active {
+  box-shadow: var(--neu-inset);
+}
 
-      border: none;
-      border-radius: var(--brad-base);
-      box-shadow: var(--neu-raised);
-      background: linear-gradient(to left, var(--clr-accent-primary) 0%, var(--clr-accent-shadow) 100%);
+.foul-modal__actions button:last-child {
+  color: var(--clr-accent-primary);
+}
 
-      font-size: var(--fs-md);
-      color: white;
+.foul-modal__actions button:last-child:disabled {
+  color: var(--clr-text-base);
+  box-shadow: var(--neu-inset);
+  opacity: 0.7;
+  cursor: not-allowed;
+}
 
-      cursor: pointer;
-    }
-  }
+@keyframes slide-up {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+@keyframes slide-down {
+  from { transform: translateY(0); }
+  to { transform: translateY(100%); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+.foul-modal-overlay--closing {
+  animation: fade-out 0.15s ease-in forwards;
+  pointer-events: none;
+}
+
+.foul-modal-overlay--closing .foul-modal {
+  animation: slide-down 0.15s ease-in forwards;
 }

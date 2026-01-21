@@ -48,38 +48,40 @@ function CoinTossModal({
   };
 
   return (
-    <div className="coin-toss-modal">
-      <h2 className="coin-toss-modal__title">Respotted Black <span className="coin-toss-modal__title--subtitle">Coin Toss</span></h2>
+    <div className="coin-toss-modal-overlay">
+      <div className="coin-toss-modal">
+        <h2 className="coin-toss-modal__title">Respotted Black <span className="coin-toss-modal__title--subtitle">Coin Toss</span></h2>
 
-      {isFlipping ? (
-        <p>Flipping coin...</p>
-      ) : tossWinner ? (
-        <>
-          <div className="coin-toss-modal__winner">
-            <p>{tossWinner.name} won!</p>
-          </div>
-
-          <div className="coin-toss-modal__choice">
-            <p>{tossWinner.name} selects who starts.</p>
-            <div className="coin-toss-modal__buttons">
-              <button onClick={() => handleChoice(tossWinner.id!)}>
-                {tossWinner.name}
-              </button>
-              <button
-                onClick={() =>
-                  handleChoice(
-                    tossWinner.id === playerOne.id
-                      ? playerTwo.id!
-                      : playerOne.id!
-                  )
-                }
-              >
-                {tossWinner.id === playerOne.id ? playerTwo.name : playerOne.name}
-              </button>
+        {isFlipping ? (
+          <p>Flipping coin...</p>
+        ) : tossWinner ? (
+          <>
+            <div className="coin-toss-modal__winner">
+              <p>{tossWinner.name}</p>
             </div>
-          </div>
-        </>
-      ) : null}
+
+            <div className="coin-toss-modal__choice">
+              <p>{tossWinner.name} decides who breaks:</p>
+              <div className="coin-toss-modal__buttons">
+                <button onClick={() => handleChoice(tossWinner.id!)}>
+                  {tossWinner.name}
+                </button>
+                <button
+                  onClick={() =>
+                    handleChoice(
+                      tossWinner.id === playerOne.id
+                        ? playerTwo.id!
+                        : playerOne.id!
+                    )
+                  }
+                >
+                  {tossWinner.id === playerOne.id ? playerTwo.name : playerOne.name}
+                </button>
+              </div>
+            </div>
+          </>
+        ) : null}
+      </div>
     </div>
   );
 }

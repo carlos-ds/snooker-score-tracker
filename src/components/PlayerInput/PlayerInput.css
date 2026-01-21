@@ -26,7 +26,8 @@
     background-color: var(--clr-surface);
     
     color: var(--clr-text-title);
-    font-size: var(--fs-base);
+    font-size: 16px;
+    /* font-size: var(--fs-base); */
 
     &::placeholder { 
       color: var(--clr-text-base);

@@ -1,0 +1,28 @@
+.statistics__stat-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+
+    padding: 1rem;
+    border-radius: var(--brad-base);
+    background-color: var(--clr-surface);
+    box-shadow: var(--neu-inset);
+    border: 1px solid var(--clr-base-tint);
+
+    .statistics__stat-label {
+        font-size: var(--fs-xs);
+        color: var(--clr-text-base);
+    }
+
+    .statistics__stat-value {
+        font-size: var(--fs-lg);
+        font-weight: 600;
+        color: var(--clr-text-title);
+    }
+
+    &.statistics__stat-item--highlight {
+        .statistics__stat-value {
+            color: var(--clr-accent-primary);
+        }
+    }
+}

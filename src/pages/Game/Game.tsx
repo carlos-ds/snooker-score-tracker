@@ -9,7 +9,7 @@ function Game() {
 
   useEffect(() => {
     if (!isLoading && !activeGame) {
-      navigate({ to: "/" });
+      navigate({ to: "/statistics" });
     }
   }, [activeGame, isLoading, navigate]);
 

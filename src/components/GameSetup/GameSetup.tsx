@@ -77,6 +77,7 @@ function GameSetup() {
   };
 
   const handleStartGame = async () => {
+    console.log("[GameSetup] handleStartGame called");
     const trimmedPlayer1 = data.player1.trim();
     const trimmedPlayer2 = data.player2.trim();
 
@@ -90,22 +91,27 @@ function GameSetup() {
     }
 
     try {
+      console.log("[GameSetup] Creating players...");
       const [playerOneId, playerTwoId] = await Promise.all([
         createPlayerMutation.mutateAsync({ name: trimmedPlayer1 }),
         createPlayerMutation.mutateAsync({ name: trimmedPlayer2 }),
       ]);
+      console.log("[GameSetup] Players created:", playerOneId, playerTwoId);
 
       if (playerOneId && playerTwoId) {
+        console.log("[GameSetup] Creating game...");
         await createGameMutation.mutateAsync({
           playerOneId,
           playerTwoId,
           redsCount: data.redsCount,
           bestOfFrames: data.bestOfFrames,
         });
+        console.log("[GameSetup] Game created, navigating to /game...");
         navigate({ to: "/game" });
       }
     } catch (error) {
-      console.error("Failed to start game:", error);
+      console.error("[GameSetup] Failed to start game:", error);
+      setError("Failed to start game. Please try again.");
     }
   };
 

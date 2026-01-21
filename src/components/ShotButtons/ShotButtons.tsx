@@ -72,7 +72,13 @@ function ShotButtons({
       if (!frame.id) return;
 
       const shots = await getShotsByFrame(frame.id);
-      setHasShotsToUndo(shots.length > 0);
+      
+      // During respotted black phase, only allow undoing shots made during this phase
+      if (frame.isRespottedBlack && frame.respottedBlackShotCount !== undefined) {
+        setHasShotsToUndo(shots.length > frame.respottedBlackShotCount);
+      } else {
+        setHasShotsToUndo(shots.length > 0);
+      }
 
       const lastShot = shots[shots.length - 1];
 

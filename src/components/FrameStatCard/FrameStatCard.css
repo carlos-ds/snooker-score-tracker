@@ -1,0 +1,84 @@
+.statistics__frame-card {
+    margin-bottom: 1.5rem;
+    padding: 1.5rem;
+
+    border-radius: var(--brad-lg);
+    box-shadow: var(--neu-soft);
+    background-color: var(--clr-surface-raised);
+    border: 1px solid var(--clr-base-tint);
+
+    .statistics__frame-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-bottom: 0.5rem;
+        cursor: pointer;
+        list-style: none;
+
+        &::-webkit-details-marker {
+            display: none;
+        }
+
+        .statistics__frame-title {
+            font-family: var(--ff-title);
+            font-size: var(--fs-base);
+            font-weight: 600;
+            color: var(--clr-text-title);
+        }
+
+        .statistics__frame-toggle-icon {
+            color: var(--clr-text-base);
+            transition: transform 0.3s ease;
+        }
+    }
+
+    &[open] .statistics__frame-toggle-icon {
+        transform: rotate(180deg);
+    }
+
+    .statistics__frame-content {
+        border-top: 1px solid var(--clr-base-tint);
+        margin-top: 0.5rem;
+        padding-top: 1rem;
+        animation: slideDown 0.3s ease-out;
+    }
+
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .statistics__frame-overview {
+        display: flex;
+        justify-content: space-around;
+        margin-bottom: 1rem;
+        padding: 1rem;
+
+        border-radius: var(--brad-base);
+        background-color: var(--clr-surface);
+        box-shadow: var(--neu-inset);
+        border: 1px solid var(--clr-base-tint);
+
+        .statistics__frame-stat {
+            text-align: center;
+
+            .statistics__frame-stat-value {
+                font-size: var(--fs-lg);
+                font-weight: 600;
+                color: var(--clr-text-title);
+            }
+
+            .statistics__frame-stat-label {
+                font-size: var(--fs-xs);
+                color: var(--clr-text-base);
+            }
+        }
+    }
+}

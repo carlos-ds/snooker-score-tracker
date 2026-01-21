@@ -38,6 +38,32 @@ export async function getGameById(id: number): Promise<Game | undefined> {
   return await db.games.get(id);
 }
 
+// Get the most recently completed game
+export async function getLatestCompletedGame(): Promise<Game | undefined> {
+  const completedGames = await db.games
+    .where("status")
+    .equals(GAME_STATUS.COMPLETED)
+    .toArray();
+
+  if (completedGames.length === 0) {
+    return undefined;
+  }
+
+  // Sort by createdAt descending (newest first)
+  return completedGames.sort((a, b) =>
+    new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  )[0];
+}
+
+// Get the latest game (active preferred, otherwise most recent completed)
+export async function getLatestGame(): Promise<Game | undefined> {
+  const activeGame = await getActiveGame();
+  if (activeGame) {
+    return activeGame;
+  }
+  return await getLatestCompletedGame();
+}
+
 // Delete all games
 export async function deleteAllGames(): Promise<void> {
   await db.games.clear();

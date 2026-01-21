@@ -1,0 +1,119 @@
+.statistics {
+  height: 100svh;
+  width: 100svw;
+  padding: 1.5rem;
+  overflow-y: auto;
+
+  .statistics__header {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+
+    .statistics__title {
+      font-family: var(--ff-title);
+      font-size: var(--fs-xl);
+      color: var(--clr-text-title);
+    }
+
+    .statistics__back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+
+      color: var(--clr-accent-primary);
+      font-size: var(--fs-sm);
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  .statistics__section {
+    margin-bottom: 2rem;
+
+    .statistics__section-title {
+      font-family: var(--ff-title);
+      font-size: var(--fs-lg);
+      color: var(--clr-text-title);
+      margin-bottom: 1rem;
+
+      padding: 0.25rem 0.75rem;
+      width: fit-content;
+
+      border-radius: var(--brad-lg);
+      background: linear-gradient(to left, var(--clr-accent-primary) 0%, var(--clr-accent-shadow) 100%);
+      color: white;
+    }
+  }
+
+  .statistics__card {
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+
+    border-radius: var(--brad-lg);
+    box-shadow: var(--neu-soft);
+    background-color: var(--clr-surface-raised);
+    border: 1px solid var(--clr-base-tint);
+
+    .statistics__card-title {
+      font-family: var(--ff-title);
+      font-size: var(--fs-base);
+      font-weight: 600;
+      color: var(--clr-text-title);
+      margin-bottom: 0.75rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--clr-base-tint);
+    }
+  }
+
+  .statistics__grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+
+  .statistics__players-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  .statistics__loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 50vh;
+
+    font-size: var(--fs-lg);
+    color: var(--clr-text-base);
+  }
+
+  .statistics__empty {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 50vh;
+    gap: 1rem;
+
+    text-align: center;
+
+    .statistics__empty-text {
+      font-size: var(--fs-lg);
+      color: var(--clr-text-base);
+    }
+
+    .statistics__empty-link {
+      color: var(--clr-accent-primary);
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+}

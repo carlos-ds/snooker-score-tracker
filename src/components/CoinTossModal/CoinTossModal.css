@@ -1,85 +1,117 @@
-.coin-toss-modal {
+.coin-toss-modal-overlay {
   position: fixed;
-  top: 35%;
-  left: 50%;
-  transform: translate(-50%, -35%);
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: 1000;
+  
+  display: flex;
+  justify-content: center;
+  align-items: center;
 
-  padding: 2rem 1rem;
-  width: 80%;
-  height: fit-content;
+  animation: fade-in 0.3s ease-out forwards;
+}
 
+.coin-toss-modal {
+  padding: 2rem 1.5rem;
+  width: 90%;
+  max-width: 400px;
+  height: auto;
+  
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  align-items: center;
+  gap: 1.5rem;
 
-  box-shadow: var(--neu-deep);
   border-radius: var(--brad-lg);
   background-color: var(--clr-surface-raised);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
 
-  .coin-toss-modal__title {
-    text-align: center;
+  animation: pop-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
 
-    color: var(--clr-text-title);
-    font-family: var(--ff-title);
-    font-size: var(--fs-lg);
-    margin-bottom: 1rem;
+.coin-toss-modal__title {
+  text-align: center;
+  color: var(--clr-text-title);
+  font-family: var(--ff-title);
+  font-size: var(--fs-lg);
+  margin: 0;
+}
 
-    .coin-toss-modal__title--subtitle {
-      font-size: var(--fs-sm);
-      font-weight: normal;
-      margin-left: .5rem;
-    }
+.coin-toss-modal__title--subtitle {
+  font-size: var(--fs-base);
+  font-weight: normal;
+  display: block;
+  margin-top: 0.25rem;
+  color: var(--clr-text-base);
+}
+
+.coin-toss-modal__winner {
+  font-size: var(--fs-xl);
+  font-weight: bold;
+  
+  width: 100%;
+  padding: 1.5rem 0;
+  
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  box-shadow: var(--neu-inset);
+  border-radius: var(--brad-base);
+  background-color: var(--clr-surface);
+  color: var(--clr-accent-primary);
+}
+
+.coin-toss-modal__choice {
+  width: 100%;
+  text-align: center;
+  font-size: var(--fs-md);
+}
+
+.coin-toss-modal__choice p {
+  color: var(--clr-text-base);
+  margin-bottom: 1rem;
+}
+
+.coin-toss-modal__buttons {
+  display: flex;
+  gap: 1rem;
+  width: 100%;
+}
+
+.coin-toss-modal__buttons button {
+  flex: 1;
+  height: 3rem;
+
+  border: none;
+  border-radius: var(--brad-base);
+  background-color: var(--clr-surface-raised);
+  box-shadow: var(--neu-raised);
+  color: var(--clr-text-title);
+  font-weight: 600;
+  font-size: var(--fs-base);
+  cursor: pointer;
+}
+
+.coin-toss-modal__buttons button:active {
+  box-shadow: var(--neu-inset);
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes pop-in {
+  from { 
+    opacity: 0;
+    transform: scale(0.95);
   }
-
-  .coin-toss-modal__winner {
-    font-size: var(--fs-xl);
-    font-weight: bold;
-
-    width: 75%;
-    height: 5rem;
-    margin: 1rem auto;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    box-shadow: var(--neu-inset);
-    border-radius: var(--brad-base);
-    background-color: var(--clr-surface);
-  }
-
-  .coin-toss-modal__choice {
-    text-align: center;
-    font-size: var(--fs-md);
-    
-    width: 75%;
-    height: 4rem;
-    margin: 1rem auto 0 auto;
-
-    p { 
-      color: var(--clr-text-title);
-    }
-
-    .coin-toss-modal__buttons { 
-      display: flex;
-      justify-content: space-between;
-
-      margin: .25rem 0 0 0;
-
-      button { 
-        width: 45%;
-        height: 2.5rem;
-
-        border: none;
-        border-radius: var(--brad-base);
-        color: white;
-        background: linear-gradient(to left, var(--clr-accent-primary) 0%, var(--clr-accent-shadow) 100%);
-
-        &:hover { 
-          box-shadow: var(--neu-deep);
-          cursor: pointer;
-        }
-      }
-    }
+  to { 
+    opacity: 1;
+    transform: scale(1);
   }
 }

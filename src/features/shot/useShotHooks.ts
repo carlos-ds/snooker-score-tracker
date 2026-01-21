@@ -295,6 +295,7 @@ interface RecordFoulParams {
   playerTwoId: number;
   isFreeBall?: boolean;
   isMiss?: boolean;
+  ballType?: BallType;
 }
 
 // Hook to record a foul and award points to the opponent.
@@ -311,6 +312,7 @@ export function useRecordFoul() {
       playerTwoId,
       gameId,
       isMiss,
+      ballType,
     }: RecordFoulParams) => {
       if (!frame.id) {
         throw new Error("Frame ID is required");
@@ -375,7 +377,7 @@ export function useRecordFoul() {
       await recordShot({
         frameId: frame.id,
         playerId: currentPlayerId,
-        ballType: "foul",
+        ballType: ballType || "foul",
         points: 0,
         isFoul: true,
         foulPoints,
